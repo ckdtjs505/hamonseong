@@ -30,6 +30,7 @@
         <div class="user-auth-control">
           <button id="loginOpenBtn" class="btn-auth btn-login">로그인</button>
           <div id="userProfileArea" class="user-profile-area" style="display: none;">
+            <button id="myPrayersBtn" class="btn-my-prayers" title="작성한 기도 모음 보기">🙏 나의 기도함</button>
             <span id="userNameSpan" class="user-name"></span>
             <button id="logoutBtn" class="btn-auth btn-logout">로그아웃</button>
           </div>
@@ -73,6 +74,18 @@
       <div id="dateDisplayText" class="date-display-text"></div>
     </nav>
 
+    <!-- Completion Status Banner -->
+    <div id="completionBanner" class="completion-banner" style="display: none;">
+      <div class="completion-banner-info">
+        <span class="banner-icon">🎉</span>
+        <div>
+          <strong id="completionBannerTitle">이 날짜의 함온성이 완료되었습니다.</strong>
+          <p id="completionBannerSub" class="banner-sub">선택하셨던 말씀과 기도 내용이 다시 활성화되었습니다.</p>
+        </div>
+      </div>
+      <button id="editCompletionBtn" class="btn-banner-action">기도 수정하기</button>
+    </div>
+
     <!-- 3. Reading Plan Summary Card -->
     <section id="planSummaryCard" class="plan-summary-card" style="display: none;">
       <div class="plan-summary-header">
@@ -90,17 +103,29 @@
     <!-- 5. Toast Notification -->
     <div id="toast" class="toast">구절이 복사되었습니다.</div>
 
-    <!-- 6. Footer -->
+    <!-- 6. Selected Verses Floating Action Bar -->
+    <div id="selectedVersesBar" class="selected-verses-bar" style="display: none;">
+      <div class="selected-bar-info">
+        <span class="selected-icon">📌</span>
+        <span>선택된 구절: <strong id="selectedCountText">0</strong>개</span>
+      </div>
+      <div class="selected-bar-actions">
+        <button id="clearSelectionBtn" class="btn-secondary-sm">선택 해제</button>
+        <button id="openCompletionBtn" class="btn-primary-sm">오늘의 함온성 완료하기</button>
+      </div>
+    </div>
+
+    <!-- 7. Footer -->
     <footer class="app-footer">
       <p>© 2026 청소년부 성경 읽기 (Youth Bible Reading) | All rights reserved.</p>
     </footer>
 
   </div>
 
-  <!-- 7. Auth Modal (Login / Register) -->
+  <!-- 8. Auth Modal (Login / Register) -->
   <div id="authModal" class="modal-overlay" style="display: none;">
     <div class="modal-card">
-      <button id="modalCloseBtn" class="modal-close-btn" aria-label="닫기">✕</button>
+      <button id="authModalCloseBtn" class="modal-close-btn" aria-label="닫기">✕</button>
 
       <!-- Modal Nav Tabs -->
       <div class="modal-tabs">
@@ -139,6 +164,60 @@
         <div id="registerErrorMsg" class="error-msg" style="display: none;"></div>
         <button type="submit" class="btn-submit">회원가입 완료</button>
       </form>
+    </div>
+  </div>
+
+  <!-- 9. Completion Modal (오늘의 함온성 완료) -->
+  <div id="completionModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-card-large">
+      <button id="completionModalCloseBtn" class="modal-close-btn" aria-label="닫기">✕</button>
+
+      <div class="modal-header-title">
+        <h2>✨ 오늘의 함온성 완료하기</h2>
+        <p>선택하신 말씀과 기도를 기록하여 나눕니다.</p>
+      </div>
+
+      <form id="completionForm" class="auth-form">
+        <div class="form-group">
+          <label for="completionMyMessage">선택한 말씀 모음 (myMessage)</label>
+          <textarea id="completionMyMessage" rows="5" class="form-textarea" readonly></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="completionPray">오늘의 한 줄 묵상 및 기도 (pray)</label>
+          <textarea id="completionPray" rows="3" class="form-textarea"
+            placeholder="오늘 말씀을 읽고 느낀 점이나 기도를 적어주세요 (선택사항)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="completionPrayForUser">서로를 위한 기도제목 (prayForUser)</label>
+          <textarea id="completionPrayForUser" rows="2" class="form-textarea"
+            placeholder="함께 성경을 읽는 친구들이나 이웃을 위한 기도제목을 적어주세요 (선택사항)"></textarea>
+        </div>
+
+        <div id="completionErrorMsg" class="error-msg" style="display: none;"></div>
+
+        <div class="modal-action-buttons">
+          <button type="button" id="completionCancelBtn" class="btn-cancel">취소</button>
+          <button type="submit" class="btn-submit">오늘의 함온성 기록 저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. Prayer History Modal (나의 기도함) -->
+  <div id="prayerHistoryModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-card-history">
+      <button id="prayerHistoryCloseBtn" class="modal-close-btn" aria-label="닫기">✕</button>
+
+      <div class="modal-header-title">
+        <h2>🙏 나의 기도함 (기록 모음)</h2>
+        <p>그동안 작성하신 함온성 묵상과 기도 제목들을 확인하실 수 있습니다.</p>
+      </div>
+
+      <div id="prayerHistoryList" class="prayer-history-list">
+        <!-- Dynamic list of past prayer cards -->
+      </div>
     </div>
   </div>
 

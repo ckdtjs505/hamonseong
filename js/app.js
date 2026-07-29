@@ -51,6 +51,7 @@ function getBookNumericId(bookInput) {
 let currentDate = new Date();
 let currentFontSize = parseFloat(localStorage.getItem('bible_font_size')) || 1.125;
 let currentUser = null;
+const selectedVersesMap = new Map();
 
 const elements = {
   themeSelect: document.getElementById('themeSelect'),
@@ -73,13 +74,37 @@ const elements = {
   userNameSpan: document.getElementById('userNameSpan'),
   logoutBtn: document.getElementById('logoutBtn'),
   authModal: document.getElementById('authModal'),
-  modalCloseBtn: document.getElementById('modalCloseBtn'),
+  authModalCloseBtn: document.getElementById('authModalCloseBtn'),
   tabLoginBtn: document.getElementById('tabLoginBtn'),
   tabRegisterBtn: document.getElementById('tabRegisterBtn'),
   loginForm: document.getElementById('loginForm'),
   registerForm: document.getElementById('registerForm'),
   loginErrorMsg: document.getElementById('loginErrorMsg'),
-  registerErrorMsg: document.getElementById('registerErrorMsg')
+  registerErrorMsg: document.getElementById('registerErrorMsg'),
+
+  // HamOnSeong Completion Elements
+  selectedVersesBar: document.getElementById('selectedVersesBar'),
+  selectedCountText: document.getElementById('selectedCountText'),
+  clearSelectionBtn: document.getElementById('clearSelectionBtn'),
+  openCompletionBtn: document.getElementById('openCompletionBtn'),
+  completionModal: document.getElementById('completionModal'),
+  completionModalCloseBtn: document.getElementById('completionModalCloseBtn'),
+  completionCancelBtn: document.getElementById('completionCancelBtn'),
+  completionForm: document.getElementById('completionForm'),
+  completionMyMessage: document.getElementById('completionMyMessage'),
+  completionPray: document.getElementById('completionPray'),
+  completionPrayForUser: document.getElementById('completionPrayForUser'),
+  completionErrorMsg: document.getElementById('completionErrorMsg'),
+
+  // Completion Status Banner & Prayer History
+  myPrayersBtn: document.getElementById('myPrayersBtn'),
+  completionBanner: document.getElementById('completionBanner'),
+  completionBannerTitle: document.getElementById('completionBannerTitle'),
+  completionBannerSub: document.getElementById('completionBannerSub'),
+  editCompletionBtn: document.getElementById('editCompletionBtn'),
+  prayerHistoryModal: document.getElementById('prayerHistoryModal'),
+  prayerHistoryCloseBtn: document.getElementById('prayerHistoryCloseBtn'),
+  prayerHistoryList: document.getElementById('prayerHistoryList')
 };
 
 // 3. Helper Functions
@@ -185,6 +210,7 @@ function initApp() {
 
   // Setup Auth Handlers & Check Session
   setupAuthEvents();
+  setupHamonseongEvents();
   checkSession();
 
   // Initial Load
@@ -201,6 +227,9 @@ function updateDateView() {
 
 // 5. API Data Fetching & Rendering
 async function loadBibleReading(dateStr) {
+  selectedVersesMap.clear();
+  updateSelectedVersesBar();
+  hideCompletionBanner();
   renderLoadingState();
 
   try {
@@ -238,6 +267,9 @@ async function loadBibleReading(dateStr) {
 
     const results = await Promise.all(wordPromises);
     renderReadingPlan(plans, results);
+
+    // Step 3: Check and restore saved completion (if user is logged in)
+    await checkAndRestoreSavedCompletion(dateStr);
 
   } catch (err) {
     console.error('Data loading error:', err);
@@ -385,20 +417,35 @@ function renderReadingPlan(plans, wordResults) {
       const verseText = verseObj.content || verseObj.text || verseObj.message || verseObj.verse_content || '';
       const bName = getBookName(verseObj.book);
 
+      const verseKey = `${verseObj.book}_${verseObj.chapter}_${verseNum}`;
+      verseItem.setAttribute('data-verse-key', verseKey);
+
+      // Check if verse was previously selected
+      if (selectedVersesMap.has(verseKey)) {
+        verseItem.classList.add('selected');
+      }
+
       verseItem.innerHTML = `
         <span class="verse-num">${verseNum}</span>
         <span class="verse-text">${verseText}</span>
       `;
 
-      // Click to copy verse text & highlight
+      // Click to toggle verse selection for HamOnSeong
       verseItem.addEventListener('click', () => {
-        verseItem.classList.toggle('highlighted');
-        const copyContent = `${bName} ${verseObj.chapter}:${verseNum} - ${verseText}`;
-        navigator.clipboard.writeText(copyContent).then(() => {
-          showToast(`구절이 복사되었습니다: ${bName} ${verseObj.chapter}:${verseNum}`);
-        }).catch(err => {
-          console.error('Clipboard copy failed:', err);
-        });
+        if (selectedVersesMap.has(verseKey)) {
+          selectedVersesMap.delete(verseKey);
+          verseItem.classList.remove('selected');
+        } else {
+          selectedVersesMap.set(verseKey, {
+            book: verseObj.book,
+            bookName: bName,
+            chapter: verseObj.chapter,
+            verse: verseNum,
+            content: verseText
+          });
+          verseItem.classList.add('selected');
+        }
+        updateSelectedVersesBar();
       });
 
       versesListEl.appendChild(verseItem);
@@ -420,6 +467,7 @@ async function checkSession() {
     if (data.status === 'success' && data.isLoggedIn) {
       currentUser = data.user;
       updateAuthUI();
+      checkAndRestoreSavedCompletion(getFormattedDate(currentDate));
     }
   } catch (err) {
     console.error('Session check error:', err);
@@ -443,8 +491,8 @@ function setupAuthEvents() {
     elements.loginOpenBtn.addEventListener('click', () => openAuthModal('login'));
   }
 
-  if (elements.modalCloseBtn) {
-    elements.modalCloseBtn.addEventListener('click', closeAuthModal);
+  if (elements.authModalCloseBtn) {
+    elements.authModalCloseBtn.addEventListener('click', closeAuthModal);
   }
 
   if (elements.authModal) {
@@ -597,6 +645,9 @@ async function handleLogout() {
 
     currentUser = null;
     updateAuthUI();
+    hideCompletionBanner();
+    selectedVersesMap.clear();
+    updateSelectedVersesBar();
     showToast(data.message || '로그아웃 되었습니다.');
   } catch (err) {
     console.error('Logout error:', err);
@@ -612,5 +663,412 @@ function showAuthError(targetEl, msg) {
   }
 }
 
-// 8. Start App on DOM Ready
+// ==========================================================================
+// 8. HamOnSeong Completion Functions
+// ==========================================================================
+function setupHamonseongEvents() {
+  if (elements.clearSelectionBtn) {
+    elements.clearSelectionBtn.addEventListener('click', clearSelectedVerses);
+  }
+
+  if (elements.openCompletionBtn) {
+    elements.openCompletionBtn.addEventListener('click', openCompletionModal);
+  }
+
+  if (elements.completionModalCloseBtn) {
+    elements.completionModalCloseBtn.addEventListener('click', closeCompletionModal);
+  }
+
+  if (elements.completionCancelBtn) {
+    elements.completionCancelBtn.addEventListener('click', closeCompletionModal);
+  }
+
+  if (elements.completionModal) {
+    elements.completionModal.addEventListener('click', (e) => {
+      if (e.target === elements.completionModal) closeCompletionModal();
+    });
+  }
+
+  if (elements.completionForm) {
+    elements.completionForm.addEventListener('submit', handleCompletionSubmit);
+  }
+
+  if (elements.myPrayersBtn) {
+    elements.myPrayersBtn.addEventListener('click', openPrayerHistoryModal);
+  }
+
+  if (elements.editCompletionBtn) {
+    elements.editCompletionBtn.addEventListener('click', openCompletionModal);
+  }
+
+  if (elements.prayerHistoryCloseBtn) {
+    elements.prayerHistoryCloseBtn.addEventListener('click', closePrayerHistoryModal);
+  }
+
+  if (elements.prayerHistoryModal) {
+    elements.prayerHistoryModal.addEventListener('click', (e) => {
+      if (e.target === elements.prayerHistoryModal) closePrayerHistoryModal();
+    });
+  }
+}
+
+function updateSelectedVersesBar() {
+  const count = selectedVersesMap.size;
+  if (elements.selectedCountText) {
+    elements.selectedCountText.textContent = count;
+  }
+
+  if (elements.selectedVersesBar) {
+    if (count > 0) {
+      elements.selectedVersesBar.style.display = 'flex';
+    } else {
+      elements.selectedVersesBar.style.display = 'none';
+    }
+  }
+}
+
+function clearSelectedVerses() {
+  selectedVersesMap.clear();
+  document.querySelectorAll('.verse-item.selected').forEach(el => {
+    el.classList.remove('selected');
+  });
+  updateSelectedVersesBar();
+  showToast('선택한 구절이 모두 해제되었습니다.');
+}
+
+function generateFormattedMyMessage() {
+  if (selectedVersesMap.size === 0) return '';
+
+  // Group verses by bookName
+  const groupedByBook = {};
+  for (const item of selectedVersesMap.values()) {
+    if (!groupedByBook[item.bookName]) {
+      groupedByBook[item.bookName] = [];
+    }
+    groupedByBook[item.bookName].push(item);
+  }
+
+  const resultLines = [];
+  for (const [bName, verses] of Object.entries(groupedByBook)) {
+    resultLines.push(bName);
+    // Sort verses by chapter & verse
+    verses.sort((a, b) => {
+      if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+      return parseInt(a.verse, 10) - parseInt(b.verse, 10);
+    });
+
+    verses.forEach(v => {
+      resultLines.push(`${v.chapter}:${v.verse} ${v.content}`);
+    });
+  }
+
+  return resultLines.join('\n');
+}
+
+function openCompletionModal() {
+  if (!currentUser) {
+    showToast('함온성 완료를 저장하려면 먼저 로그인해주세요.');
+    openAuthModal('login');
+    return;
+  }
+
+  if (selectedVersesMap.size === 0) {
+    showToast('구절을 먼저 하나 이상 선택해주세요.');
+    return;
+  }
+
+  const formattedMsg = generateFormattedMyMessage();
+  if (elements.completionMyMessage) {
+    elements.completionMyMessage.value = formattedMsg;
+  }
+
+  if (elements.completionErrorMsg) {
+    elements.completionErrorMsg.style.display = 'none';
+    elements.completionErrorMsg.textContent = '';
+  }
+
+  if (elements.completionModal) {
+    elements.completionModal.style.display = 'flex';
+  }
+}
+
+function closeCompletionModal() {
+  if (elements.completionModal) {
+    elements.completionModal.style.display = 'none';
+  }
+}
+
+async function handleCompletionSubmit(e) {
+  e.preventDefault();
+
+  if (elements.completionErrorMsg) {
+    elements.completionErrorMsg.style.display = 'none';
+    elements.completionErrorMsg.textContent = '';
+  }
+
+  const myMessage = elements.completionMyMessage ? elements.completionMyMessage.value.trim() : '';
+  const pray = elements.completionPray ? elements.completionPray.value.trim() : '';
+  const prayForUser = elements.completionPrayForUser ? elements.completionPrayForUser.value.trim() : '';
+
+  if (!myMessage) {
+    showAuthError(elements.completionErrorMsg, '선택된 구절 정보가 없습니다.');
+    return;
+  }
+
+  try {
+    const res = await fetch('api/save_completion.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        myMessage: myMessage,
+        pray: pray,
+        prayForUser: prayForUser,
+        daycnt: 1
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      closeCompletionModal();
+      showToast(`🎉 오늘의 함온성이 성공적으로 저장되었습니다! (${data.data.name} 님)`);
+      checkAndRestoreSavedCompletion(getFormattedDate(currentDate));
+    } else {
+      showAuthError(elements.completionErrorMsg, data.message || '저장에 실패했습니다.');
+    }
+  } catch (err) {
+    console.error('Save completion error:', err);
+    showAuthError(elements.completionErrorMsg, '저장 처리 중 네트워크 오류가 발생했습니다.');
+  }
+}
+
+// ==========================================================================
+// 9. Prayer History & Saved Completion Restoration Functions
+// ==========================================================================
+async function checkAndRestoreSavedCompletion(dateStr) {
+  hideCompletionBanner();
+  if (!currentUser) return;
+
+  try {
+    const res = await fetch(`api/get_completions.php?date=${dateStr}`);
+    if (!res.ok) return;
+    const result = await res.json();
+
+    if (result.status === 'success' && result.data) {
+      const completion = result.data;
+      showCompletionBanner(completion);
+      restoreSavedMyMessage(completion.myMessage);
+
+      if (elements.completionPray) elements.completionPray.value = completion.pray || '';
+      if (elements.completionPrayForUser) elements.completionPrayForUser.value = completion.prayForUser || '';
+    }
+  } catch (err) {
+    console.error('Error checking saved completion:', err);
+  }
+}
+
+function showCompletionBanner(completion) {
+  if (elements.completionBanner) {
+    elements.completionBanner.style.display = 'flex';
+  }
+}
+
+function hideCompletionBanner() {
+  if (elements.completionBanner) {
+    elements.completionBanner.style.display = 'none';
+  }
+}
+
+function restoreSavedMyMessage(myMessage) {
+  if (!myMessage) return;
+
+  const lines = myMessage.split('\n');
+  let currentBookId = 1;
+
+  lines.forEach(rawLine => {
+    const line = rawLine.trim();
+    if (!line) return;
+
+    if (BIBLE_BOOK_IDS[line]) {
+      currentBookId = BIBLE_BOOK_IDS[line];
+      return;
+    }
+
+    const match = line.match(/^(\d+):(\d+)\s*(.*)$/);
+    if (match) {
+      const chapter = parseInt(match[1], 10);
+      const verse = match[2];
+      const content = match[3] || '';
+      const verseKey = `${currentBookId}_${chapter}_${verse}`;
+
+      selectedVersesMap.set(verseKey, {
+        book: currentBookId,
+        bookName: getBookName(currentBookId),
+        chapter: chapter,
+        verse: verse,
+        content: content
+      });
+
+      const el = document.querySelector(`.verse-item[data-verse-key="${verseKey}"]`);
+      if (el) {
+        el.classList.add('selected');
+      }
+    }
+  });
+
+  updateSelectedVersesBar();
+}
+
+async function openPrayerHistoryModal() {
+  if (!currentUser) {
+    showToast('나의 기도함을 확인하시려면 먼저 로그인해주세요.');
+    openAuthModal('login');
+    return;
+  }
+
+  if (elements.prayerHistoryModal) {
+    elements.prayerHistoryModal.style.display = 'flex';
+  }
+
+  loadPrayerHistory();
+}
+
+function closePrayerHistoryModal() {
+  if (elements.prayerHistoryModal) {
+    elements.prayerHistoryModal.style.display = 'none';
+  }
+}
+
+async function loadPrayerHistory() {
+  if (!elements.prayerHistoryList) return;
+
+  elements.prayerHistoryList.innerHTML = `
+    <div class="empty-history">기도 기록을 불러오는 중입니다...</div>
+  `;
+
+  try {
+    const res = await fetch('api/get_completions.php?type=all');
+    const result = await res.json();
+
+    if (result.status !== 'success' || !result.data || result.data.length === 0) {
+      elements.prayerHistoryList.innerHTML = `
+        <div class="empty-history">
+          <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">🙏</span>
+          <p style="font-weight: 600; color: var(--text-main);">아직 저장된 기도나 말씀 묵상 기록이 없습니다.</p>
+          <p style="font-size: 0.85rem; color: var(--text-subtle); margin-top: 0.25rem;">오늘 말씀을 읽고 '완료하기'를 눌러 첫 기도를 남겨보세요!</p>
+        </div>
+      `;
+      return;
+    }
+
+    elements.prayerHistoryList.innerHTML = result.data.map(item => {
+      const dateText = item.timestamp || item.created_at;
+      const myMessageHtml = item.myMessage ? escapeHtml(item.myMessage) : '';
+      const prayHtml = item.pray ? escapeHtml(item.pray) : '';
+      const prayForUserHtml = item.prayForUser ? escapeHtml(item.prayForUser) : '';
+      const rawDateStr = item.created_at || item.timestamp;
+
+      return `
+        <div class="prayer-card">
+          <div class="prayer-card-header">
+            <div class="prayer-card-date">
+              <span>📅</span> ${escapeHtml(dateText)} ${item.daycnt ? `(${item.daycnt}회차)` : ''}
+            </div>
+            <div class="prayer-card-actions">
+              <button class="btn-prayer-jump" onclick="jumpToPrayerDate('${escapeHtml(rawDateStr)}')">이 날짜로 이동</button>
+              <button class="btn-prayer-delete" onclick="deletePrayerRecord(${item.id})">삭제</button>
+            </div>
+          </div>
+
+          <div class="prayer-section">
+            <div class="prayer-section-label">선택한 말씀</div>
+            <div class="prayer-section-content scripture-box">${myMessageHtml}</div>
+          </div>
+
+          ${prayHtml ? `
+            <div class="prayer-section">
+              <div class="prayer-section-label">오늘의 묵상 및 기도</div>
+              <div class="prayer-section-content">${prayHtml}</div>
+            </div>
+          ` : ''}
+
+          ${prayForUserHtml ? `
+            <div class="prayer-section">
+              <div class="prayer-section-label">서로를 위한 기도제목</div>
+              <div class="prayer-section-content">${prayForUserHtml}</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+
+  } catch (err) {
+    console.error('Error loading prayer history:', err);
+    elements.prayerHistoryList.innerHTML = `
+      <div class="empty-history" style="color: #ef4444;">
+        기도 기록을 불러오지 못했습니다. 다시 시도해 주세요.
+      </div>
+    `;
+  }
+}
+
+function jumpToPrayerDate(rawDateStr) {
+  let dateObj = null;
+  if (rawDateStr.includes('-')) {
+    const parts = rawDateStr.split(' ')[0].split('-');
+    if (parts.length === 3) {
+      dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+  } else if (rawDateStr.includes('.')) {
+    const parts = rawDateStr.split('.').map(p => p.trim());
+    if (parts.length >= 3) {
+      dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+  }
+
+  if (dateObj && !isNaN(dateObj.getTime())) {
+    currentDate = dateObj;
+    closePrayerHistoryModal();
+    updateDateView();
+    showToast(`${getFormattedDate(dateObj)} 말씀으로 이동했습니다.`);
+  }
+}
+
+async function deletePrayerRecord(id) {
+  if (!confirm('정말로 이 기도 기록을 삭제하시겠습니까?')) return;
+
+  try {
+    const res = await fetch('api/delete_completion.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      showToast('기도 기록이 삭제되었습니다.');
+      loadPrayerHistory();
+      updateDateView();
+    } else {
+      showToast(data.message || '삭제에 실패했습니다.');
+    }
+  } catch (err) {
+    console.error('Delete error:', err);
+    showToast('삭제 중 오류가 발생했습니다.');
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+window.jumpToPrayerDate = jumpToPrayerDate;
+window.deletePrayerRecord = deletePrayerRecord;
+
+// 10. Start App on DOM Ready
 document.addEventListener('DOMContentLoaded', initApp);
