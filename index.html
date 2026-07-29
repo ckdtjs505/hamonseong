@@ -1,3 +1,95 @@
-<html> 
-<div>i Test </div>
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>청년부 성경 읽기 - 매일 말씀 묵상</title>
+  <meta name="description" content="청년부 성경 읽기표 및 매일 말씀 묵상 웹 애플리케이션입니다.">
+
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- 1. Header & Controls -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">✝</div>
+        <div class="brand-title">
+          <h1>청년부 성경 읽기</h1>
+          <p>매일 말씀으로 삶을 채우는 시간</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Font Size Adjuster -->
+        <div class="control-group" title="글자 크기 조절">
+          <button id="fontDecreaseBtn" class="btn-icon" aria-label="글자 크기 축소">A-</button>
+          <button id="fontIncreaseBtn" class="btn-icon" aria-label="글자 크기 확대">A+</button>
+        </div>
+
+        <!-- Theme Selector -->
+        <select id="themeSelect" class="theme-select" aria-label="테마 선택">
+          <option value="light">☀️ 라이트 모드</option>
+          <option value="dark">🌙 다크 모드</option>
+          <option value="paper">📜 페이퍼 모드</option>
+        </select>
+      </div>
+    </header>
+
+    <!-- 2. Date Navigation Bar -->
+    <nav class="date-nav-card">
+      <div class="date-controls">
+        <button id="prevDateBtn" class="btn-nav" aria-label="이전 날짜">
+          <span>‹</span> 이전
+        </button>
+
+        <div class="date-picker-wrapper">
+          <input type="date" id="dateInput" aria-label="날짜 선택">
+        </div>
+
+        <button id="todayBtn" class="btn-nav today-btn" aria-label="오늘 날짜">
+          오늘
+        </button>
+
+        <button id="nextDateBtn" class="btn-nav" aria-label="다음 날짜">
+          다음 <span>›</span>
+        </button>
+      </div>
+
+      <div id="dateDisplayText" class="date-display-text"></div>
+    </nav>
+
+    <!-- 3. Reading Plan Summary Card -->
+    <section id="planSummaryCard" class="plan-summary-card" style="display: none;">
+      <div class="plan-summary-header">
+        <span class="plan-badge">오늘의 말씀 범위</span>
+      </div>
+      <div id="planTitle" class="plan-title"></div>
+      <div id="planRangeList" class="plan-range-list"></div>
+    </section>
+
+    <!-- 4. Scripture Reading Main Content -->
+    <main id="readingContainer" class="reading-container">
+      <!-- Verses will be dynamically rendered here via JavaScript -->
+    </main>
+
+    <!-- 5. Toast Notification -->
+    <div id="toast" class="toast">구절이 복사되었습니다.</div>
+
+    <!-- 6. Footer -->
+    <footer class="app-footer">
+      <p>© 2026 청년부 성경 읽기 (Youth Bible Reading) | All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script src="js/app.js"></script>
+</body>
+
 </html>

@@ -1,0 +1,560 @@
+/* ==========================================================================
+   청년부 성경 읽기 (Youth Bible Reading) - Design System & Stylesheet
+   ========================================================================== */
+
+/* 1. Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&display=swap');
+
+/* 2. Theme CSS Variables */
+:root {
+  /* Light Theme (Default) */
+  --bg-primary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --border-color: #e2e8f0;
+
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+
+  --accent-primary: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-light: #eff6ff;
+  --accent-border: #bfdbfe;
+
+  --verse-num-color: #3b82f6;
+  --verse-highlight-bg: #fef9c3;
+  --verse-hover-bg: #f8fafc;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+
+  --font-ui: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-reading: 'Noto Serif KR', Georgia, serif;
+
+  --bible-font-size: 1.125rem;
+  /* 18px */
+  --bible-line-height: 1.85;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-card: #1e293b;
+  --bg-subtle: #334155;
+  --border-color: #334155;
+
+  --text-main: #f8fafc;
+  --text-muted: #cbd5e1;
+  --text-subtle: #64748b;
+
+  --accent-primary: #60a5fa;
+  --accent-hover: #93c5fd;
+  --accent-light: #1e3a8a;
+  --accent-border: #1d4ed8;
+
+  --verse-num-color: #60a5fa;
+  --verse-highlight-bg: #713f12;
+  --verse-hover-bg: #334155;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* Paper / Warm Sepia Theme */
+[data-theme="paper"] {
+  --bg-primary: #fbf7ee;
+  --bg-card: #f4efe0;
+  --bg-subtle: #e9e2cf;
+  --border-color: #e0d7c3;
+
+  --text-main: #2c2520;
+  --text-muted: #6b5e52;
+  --text-subtle: #9c8e7e;
+
+  --accent-primary: #b45309;
+  --accent-hover: #92400e;
+  --accent-light: #fef3c7;
+  --accent-border: #fde68a;
+
+  --verse-num-color: #b45309;
+  --verse-highlight-bg: #fde68a;
+  --verse-hover-bg: #ede6d4;
+
+  --shadow-sm: 0 1px 2px 0 rgba(70, 50, 20, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(70, 50, 20, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(70, 50, 20, 0.1);
+}
+
+/* 3. Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem 1rem;
+}
+
+/* 4. Header Section */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--accent-primary), #6366f1);
+  color: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-title h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.brand-title p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Controls & Settings Toolbar */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2px;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background-color: var(--bg-subtle);
+  color: var(--accent-primary);
+}
+
+.theme-select {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  outline: none;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease;
+}
+
+.theme-select:focus {
+  border-color: var(--accent-primary);
+}
+
+/* 5. Date Navigation Bar */
+.date-nav-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.date-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.btn-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background-color: var(--bg-subtle);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-nav:hover {
+  background-color: var(--accent-light);
+  border-color: var(--accent-border);
+  color: var(--accent-primary);
+}
+
+.btn-nav.today-btn {
+  font-weight: 600;
+  background-color: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+}
+
+.btn-nav.today-btn:hover {
+  background-color: var(--accent-hover);
+  color: #ffffff;
+}
+
+.date-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-primary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.date-picker-wrapper input[type="date"] {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.date-display-text {
+  margin-top: 0.8rem;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* 6. Plan Info Card */
+.plan-summary-card {
+  background: linear-gradient(135deg, var(--accent-light), var(--bg-card));
+  border: 1px solid var(--accent-border);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.plan-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: var(--accent-primary);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.plan-date-tag {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.plan-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  margin-top: 0.2rem;
+}
+
+.plan-range-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.range-chip {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 7. Scripture Reading Area */
+.reading-container {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2rem 1.75rem;
+  box-shadow: var(--shadow-md);
+  min-height: 350px;
+}
+
+.chapter-section {
+  margin-bottom: 2.5rem;
+}
+
+.chapter-section:last-child {
+  margin-bottom: 0;
+}
+
+.chapter-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+  padding-bottom: 0.6rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid var(--accent-primary);
+}
+
+.verses-list {
+  font-family: var(--font-reading);
+  font-size: var(--bible-font-size);
+  line-height: var(--bible-line-height);
+  color: var(--text-main);
+}
+
+.verse-item {
+  position: relative;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.verse-item:hover {
+  background-color: var(--verse-hover-bg);
+}
+
+.verse-item.highlighted {
+  background-color: var(--verse-highlight-bg);
+}
+
+.verse-num {
+  font-family: var(--font-ui);
+  font-size: 0.82em;
+  font-weight: 700;
+  color: var(--verse-num-color);
+  user-select: none;
+  min-width: 1.6em;
+  text-align: right;
+}
+
+.verse-text {
+  flex: 1;
+  word-break: keep-all;
+}
+
+/* Copy Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* 8. Loading & Empty States */
+.loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-line {
+  height: 20px;
+  background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--border-color) 50%, var(--bg-subtle) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.empty-state,
+.error-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.state-icon {
+  font-size: 2.8rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.state-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.state-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 400px;
+  margin: 0 auto 1.25rem auto;
+  word-break: keep-all;
+}
+
+.btn-retry {
+  background-color: var(--accent-primary);
+  color: #ffffff;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-retry:hover {
+  background-color: var(--accent-hover);
+}
+
+/* 9. Footer */
+.app-footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 600px) {
+  .app-container {
+    padding: 1rem 0.75rem 3rem 0.75rem;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .date-controls {
+    flex-wrap: wrap;
+  }
+
+  .date-picker-wrapper {
+    width: 100%;
+    justify-content: center;
+    order: -1;
+  }
+
+  .btn-nav {
+    flex: 1;
+  }
+
+  .reading-container {
+    padding: 1.5rem 1rem;
+  }
+}
