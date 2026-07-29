@@ -15,29 +15,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/common/db_helper.php';
 
 try {
-    // 3. GET 파라미터 받기 (기본값: book=1, chapter=1)
-    $book    = isset($_GET['book']) ? (int)$_GET['book'] : 1;
-    $chapter = isset($_GET['chapter']) ? (int)$_GET['chapter'] : 1;
+    if (!$pdo) {
+        throw new Exception("DB 연결 실패");
+    }
 
-    // 4. 조건절 구성
-    $conditions = [
-        'book'    => $book,
-        'chapter' => $chapter
-    ];
+    // 3. 파라미터 파싱 (book, start, end 또는 chapter)
+    $bookInput = isset($_GET['book']) ? $_GET['book'] : 1;
+    $book      = is_numeric($bookInput) ? (int)$bookInput : trim($bookInput);
 
-    // 5. DB에서 bibles_woori 테이블 데이터 조회
-    $verses = getTableData($pdo, 'bibles_woori', $conditions, 200);
+    if (isset($_GET['start'])) {
+        $start = (int)$_GET['start'];
+        $end   = isset($_GET['end']) ? (int)$_GET['end'] : $start;
+    } elseif (isset($_GET['chapter'])) {
+        $start = (int)$_GET['chapter'];
+        $end   = $start;
+    } else {
+        $start = 1;
+        $end   = 1;
+    }
 
-    // 6. 성공 응답 (JSON)
+    // start와 end 범위 정렬
+    $realStart = min($start, $end);
+    $realEnd   = max($start, $end);
+
+    // 4. SQL 쿼리 작성 (장(chapter) 범위 검색)
+    $sql = "SELECT * FROM `bibles_woori` 
+            WHERE `book` = :book 
+              AND `chapter` >= :start 
+              AND `chapter` <= :end";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':book', $book, is_int($book) ? PDO::PARAM_INT : PDO::PARAM_STR);
+    $stmt->bindValue(':start', $realStart, PDO::PARAM_INT);
+    $stmt->bindValue(':end', $realEnd, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $verses = $stmt->fetchAll();
+
+    // 5. 성공 응답 (JSON)
     http_response_code(200);
     echo json_encode([
         'status' => 'success',
+        'query'  => [
+            'book'  => $book,
+            'start' => $realStart,
+            'end'   => $realEnd
+        ],
         'count'  => count($verses),
         'data'   => $verses
     ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
 } catch (InvalidArgumentException $e) {
-    // 보안 이슈(허용되지 않은 테이블 등) 예외 처리
     http_response_code(400);
     echo json_encode([
         'status'  => 'error',
@@ -45,7 +73,6 @@ try {
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
-    // 기타 서버 오류 예외 처리
     http_response_code(500);
     echo json_encode([
         'status'  => 'error',
