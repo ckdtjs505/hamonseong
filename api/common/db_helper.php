@@ -13,7 +13,7 @@ require_once __DIR__ . '/db_connect.php';
 function getTableData(PDO $pdo, string $tableName, array $conditions = [], int $limit = 100): array 
 {
     // 1. 허용된 테이블만 조회 가능하도록 화이트리스트 검증 (보안)
-    $allowedTables = ['bibles_woori']; // 허용할 테이블 목록 지정
+    $allowedTables = ['bibles_woori', 'read_plan']; // 허용할 테이블 목록 지정
     if (!in_array($tableName, $allowedTables, true)) {
         throw new InvalidArgumentException("허용되지 않은 테이블 접근입니다.");
     }
