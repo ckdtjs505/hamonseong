@@ -1,5 +1,5 @@
 /**
- * 청년부 성경 읽기 (Youth Bible Reading) App Script
+ * 청소년부 성경 읽기 (Youth Bible Reading) App Script
  */
 
 // 1. 성경 66권 한글 명칭 및 숫자 ID 맵
@@ -50,6 +50,7 @@ function getBookNumericId(bookInput) {
 // 2. State & DOM Elements
 let currentDate = new Date();
 let currentFontSize = parseFloat(localStorage.getItem('bible_font_size')) || 1.125;
+let currentUser = null;
 
 const elements = {
   themeSelect: document.getElementById('themeSelect'),
@@ -64,7 +65,21 @@ const elements = {
   planTitle: document.getElementById('planTitle'),
   planRangeList: document.getElementById('planRangeList'),
   readingContainer: document.getElementById('readingContainer'),
-  toast: document.getElementById('toast')
+  toast: document.getElementById('toast'),
+
+  // Auth DOM Elements
+  loginOpenBtn: document.getElementById('loginOpenBtn'),
+  userProfileArea: document.getElementById('userProfileArea'),
+  userNameSpan: document.getElementById('userNameSpan'),
+  logoutBtn: document.getElementById('logoutBtn'),
+  authModal: document.getElementById('authModal'),
+  modalCloseBtn: document.getElementById('modalCloseBtn'),
+  tabLoginBtn: document.getElementById('tabLoginBtn'),
+  tabRegisterBtn: document.getElementById('tabRegisterBtn'),
+  loginForm: document.getElementById('loginForm'),
+  registerForm: document.getElementById('registerForm'),
+  loginErrorMsg: document.getElementById('loginErrorMsg'),
+  registerErrorMsg: document.getElementById('registerErrorMsg')
 };
 
 // 3. Helper Functions
@@ -167,6 +182,10 @@ function initApp() {
       }
     });
   }
+
+  // Setup Auth Handlers & Check Session
+  setupAuthEvents();
+  checkSession();
 
   // Initial Load
   updateDateView();
@@ -279,22 +298,22 @@ function renderReadingPlan(plans, wordResults) {
   if (elements.planSummaryCard) {
     elements.planSummaryCard.style.display = 'flex';
 
-    // Create Range Titles
-    const rangeTitles = wordResults.map(item => {
+    // Unique range titles
+    const uniqueRangeSet = new Set();
+    wordResults.forEach(item => {
       const bookName = getBookName(item.planInfo.book);
       const start = item.planInfo.start;
       const end = item.planInfo.end;
-      return start === end ? `${bookName} ${start}장` : `${bookName} ${start}장 ~ ${end}장`;
+      const titleText = (start === end || !end) ? `${bookName} ${start}장` : `${bookName} ${start}장 ~ ${end}장`;
+      uniqueRangeSet.add(titleText);
     });
+
+    const rangeTitles = Array.from(uniqueRangeSet);
 
     if (elements.planTitle) elements.planTitle.textContent = rangeTitles.join(', ');
 
     if (elements.planRangeList) {
-      elements.planRangeList.innerHTML = wordResults.map(item => {
-        const bookName = getBookName(item.planInfo.book);
-        const start = item.planInfo.start;
-        const end = item.planInfo.end;
-        const text = start === end ? `${bookName} ${start}장` : `${bookName} ${start}~${end}장`;
+      elements.planRangeList.innerHTML = rangeTitles.map(text => {
         return `<span class="range-chip">${text}</span>`;
       }).join('');
     }
@@ -304,72 +323,294 @@ function renderReadingPlan(plans, wordResults) {
   if (!elements.readingContainer) return;
   elements.readingContainer.innerHTML = '';
 
-  let totalVerseCount = 0;
+  // Collect and deduplicate verses across all results
+  const allVerses = [];
+  const seenVerseKeys = new Set();
 
   wordResults.forEach(item => {
     const verses = item.verses || [];
-    if (verses.length === 0) return;
-
-    totalVerseCount += verses.length;
-
-    // Group verses by book and chapter
-    const grouped = {};
     verses.forEach(v => {
-      const bName = getBookName(v.book || item.planInfo.book);
+      const bCode = v.book || item.planInfo.book;
       const ch = v.chapter || 1;
-      const key = `${bName} ${ch}장`;
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(v);
-    });
+      const vs = v.verse || 1;
+      const key = v.id ? `id_${v.id}` : `${bCode}_${ch}_${vs}`;
 
-    for (const [chapterTitle, chapterVerses] of Object.entries(grouped)) {
-      const chapterSection = document.createElement('div');
-      chapterSection.className = 'chapter-section';
-
-      const titleEl = document.createElement('h2');
-      titleEl.className = 'chapter-title';
-      titleEl.innerHTML = `<span>📖</span> ${chapterTitle}`;
-      chapterSection.appendChild(titleEl);
-
-      const versesListEl = document.createElement('div');
-      versesListEl.className = 'verses-list';
-
-      chapterVerses.forEach(verseObj => {
-        const verseItem = document.createElement('div');
-        verseItem.className = 'verse-item';
-
-        const verseNum = verseObj.verse || '';
-        const verseText = verseObj.content || verseObj.text || verseObj.message || verseObj.verse_content || '';
-        const bName = getBookName(verseObj.book || item.planInfo.book);
-
-        verseItem.innerHTML = `
-          <span class="verse-num">${verseNum}</span>
-          <span class="verse-text">${verseText}</span>
-        `;
-
-        // Click to copy verse text & highlight
-        verseItem.addEventListener('click', () => {
-          verseItem.classList.toggle('highlighted');
-          const copyContent = `${bName} ${verseObj.chapter}:${verseNum} - ${verseText}`;
-          navigator.clipboard.writeText(copyContent).then(() => {
-            showToast(`구절이 복사되었습니다: ${bName} ${verseObj.chapter}:${verseNum}`);
-          }).catch(err => {
-            console.error('Clipboard copy failed:', err);
-          });
+      if (!seenVerseKeys.has(key)) {
+        seenVerseKeys.add(key);
+        allVerses.push({
+          ...v,
+          book: bCode,
+          chapter: ch,
+          verse: vs
         });
-
-        versesListEl.appendChild(verseItem);
-      });
-
-      chapterSection.appendChild(versesListEl);
-      elements.readingContainer.appendChild(chapterSection);
-    }
+      }
+    });
   });
 
-  if (totalVerseCount === 0) {
+  if (allVerses.length === 0) {
     renderEmptyPlanState(getFormattedDate(currentDate));
+    return;
+  }
+
+  // Group verses globally by Book & Chapter
+  const grouped = {};
+  allVerses.forEach(v => {
+    const bName = getBookName(v.book);
+    const key = `${bName} ${v.chapter}장`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(v);
+  });
+
+  // Render each chapter section once
+  for (const [chapterTitle, chapterVerses] of Object.entries(grouped)) {
+    const chapterSection = document.createElement('div');
+    chapterSection.className = 'chapter-section';
+
+    const titleEl = document.createElement('h2');
+    titleEl.className = 'chapter-title';
+    titleEl.innerHTML = `<span>📖</span> ${chapterTitle}`;
+    chapterSection.appendChild(titleEl);
+
+    const versesListEl = document.createElement('div');
+    versesListEl.className = 'verses-list';
+
+    // Sort verses by verse number
+    chapterVerses.sort((a, b) => (parseInt(a.verse, 10) || 0) - (parseInt(b.verse, 10) || 0));
+
+    chapterVerses.forEach(verseObj => {
+      const verseItem = document.createElement('div');
+      verseItem.className = 'verse-item';
+
+      const verseNum = verseObj.verse || '';
+      const verseText = verseObj.content || verseObj.text || verseObj.message || verseObj.verse_content || '';
+      const bName = getBookName(verseObj.book);
+
+      verseItem.innerHTML = `
+        <span class="verse-num">${verseNum}</span>
+        <span class="verse-text">${verseText}</span>
+      `;
+
+      // Click to copy verse text & highlight
+      verseItem.addEventListener('click', () => {
+        verseItem.classList.toggle('highlighted');
+        const copyContent = `${bName} ${verseObj.chapter}:${verseNum} - ${verseText}`;
+        navigator.clipboard.writeText(copyContent).then(() => {
+          showToast(`구절이 복사되었습니다: ${bName} ${verseObj.chapter}:${verseNum}`);
+        }).catch(err => {
+          console.error('Clipboard copy failed:', err);
+        });
+      });
+
+      versesListEl.appendChild(verseItem);
+    });
+
+    chapterSection.appendChild(versesListEl);
+    elements.readingContainer.appendChild(chapterSection);
   }
 }
 
-// 7. Start App on DOM Ready
+// ==========================================================================
+// 7. Auth Functions (Login, Register, Session)
+// ==========================================================================
+async function checkSession() {
+  try {
+    const res = await fetch('api/check_session.php');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.status === 'success' && data.isLoggedIn) {
+      currentUser = data.user;
+      updateAuthUI();
+    }
+  } catch (err) {
+    console.error('Session check error:', err);
+  }
+}
+
+function updateAuthUI() {
+  if (currentUser) {
+    if (elements.loginOpenBtn) elements.loginOpenBtn.style.display = 'none';
+    if (elements.userProfileArea) elements.userProfileArea.style.display = 'flex';
+    if (elements.userNameSpan) elements.userNameSpan.textContent = `${currentUser.name} 님`;
+  } else {
+    if (elements.loginOpenBtn) elements.loginOpenBtn.style.display = 'inline-block';
+    if (elements.userProfileArea) elements.userProfileArea.style.display = 'none';
+    if (elements.userNameSpan) elements.userNameSpan.textContent = '';
+  }
+}
+
+function setupAuthEvents() {
+  if (elements.loginOpenBtn) {
+    elements.loginOpenBtn.addEventListener('click', () => openAuthModal('login'));
+  }
+
+  if (elements.modalCloseBtn) {
+    elements.modalCloseBtn.addEventListener('click', closeAuthModal);
+  }
+
+  if (elements.authModal) {
+    elements.authModal.addEventListener('click', (e) => {
+      if (e.target === elements.authModal) closeAuthModal();
+    });
+  }
+
+  if (elements.tabLoginBtn) {
+    elements.tabLoginBtn.addEventListener('click', () => switchAuthTab('login'));
+  }
+
+  if (elements.tabRegisterBtn) {
+    elements.tabRegisterBtn.addEventListener('click', () => switchAuthTab('register'));
+  }
+
+  if (elements.loginForm) {
+    elements.loginForm.addEventListener('submit', handleLogin);
+  }
+
+  if (elements.registerForm) {
+    elements.registerForm.addEventListener('submit', handleRegister);
+  }
+
+  if (elements.logoutBtn) {
+    elements.logoutBtn.addEventListener('click', handleLogout);
+  }
+}
+
+function openAuthModal(defaultTab = 'login') {
+  if (elements.authModal) {
+    elements.authModal.style.display = 'flex';
+    clearAuthErrors();
+    switchAuthTab(defaultTab);
+  }
+}
+
+function closeAuthModal() {
+  if (elements.authModal) {
+    elements.authModal.style.display = 'none';
+    clearAuthErrors();
+  }
+}
+
+function switchAuthTab(tab) {
+  clearAuthErrors();
+  if (tab === 'login') {
+    if (elements.tabLoginBtn) elements.tabLoginBtn.classList.add('active');
+    if (elements.tabRegisterBtn) elements.tabRegisterBtn.classList.remove('active');
+    if (elements.loginForm) elements.loginForm.style.display = 'flex';
+    if (elements.registerForm) elements.registerForm.style.display = 'none';
+  } else {
+    if (elements.tabRegisterBtn) elements.tabRegisterBtn.classList.add('active');
+    if (elements.tabLoginBtn) elements.tabLoginBtn.classList.remove('active');
+    if (elements.registerForm) elements.registerForm.style.display = 'flex';
+    if (elements.loginForm) elements.loginForm.style.display = 'none';
+  }
+}
+
+function clearAuthErrors() {
+  if (elements.loginErrorMsg) {
+    elements.loginErrorMsg.style.display = 'none';
+    elements.loginErrorMsg.textContent = '';
+  }
+  if (elements.registerErrorMsg) {
+    elements.registerErrorMsg.style.display = 'none';
+    elements.registerErrorMsg.textContent = '';
+  }
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  clearAuthErrors();
+
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+
+  if (!username || !password) {
+    showAuthError(elements.loginErrorMsg, '아이디와 비밀번호를 모두 입력해주세요.');
+    return;
+  }
+
+  try {
+    const res = await fetch('api/login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      currentUser = data.user;
+      updateAuthUI();
+      closeAuthModal();
+      showToast(`반갑습니다, ${currentUser.name} 님!`);
+      // Reset form
+      elements.loginForm.reset();
+    } else {
+      showAuthError(elements.loginErrorMsg, data.message || '로그인에 실패했습니다.');
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    showAuthError(elements.loginErrorMsg, '로그인 처리 중 네트워크 오류가 발생했습니다.');
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  clearAuthErrors();
+
+  const name = document.getElementById('registerName').value.trim();
+  const username = document.getElementById('registerUsername').value.trim();
+  const password = document.getElementById('registerPassword').value.trim();
+
+  if (!name || !username || !password) {
+    showAuthError(elements.registerErrorMsg, '모든 필수 항목을 입력해주세요.');
+    return;
+  }
+
+  try {
+    const res = await fetch('api/register.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      currentUser = data.user;
+      updateAuthUI();
+      closeAuthModal();
+      showToast(`회원가입 완료! 환영합니다, ${currentUser.name} 님!`);
+      // Reset form
+      elements.registerForm.reset();
+    } else {
+      showAuthError(elements.registerErrorMsg, data.message || '회원가입에 실패했습니다.');
+    }
+  } catch (err) {
+    console.error('Register error:', err);
+    showAuthError(elements.registerErrorMsg, '회원가입 처리 중 네트워크 오류가 발생했습니다.');
+  }
+}
+
+async function handleLogout() {
+  try {
+    const res = await fetch('api/logout.php');
+    const data = await res.json();
+
+    currentUser = null;
+    updateAuthUI();
+    showToast(data.message || '로그아웃 되었습니다.');
+  } catch (err) {
+    console.error('Logout error:', err);
+    currentUser = null;
+    updateAuthUI();
+  }
+}
+
+function showAuthError(targetEl, msg) {
+  if (targetEl) {
+    targetEl.textContent = msg;
+    targetEl.style.display = 'block';
+  }
+}
+
+// 8. Start App on DOM Ready
 document.addEventListener('DOMContentLoaded', initApp);
