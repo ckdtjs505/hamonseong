@@ -493,10 +493,12 @@ function updateAuthUI() {
     if (elements.loginOpenBtn) elements.loginOpenBtn.style.display = 'none';
     if (elements.userProfileArea) elements.userProfileArea.style.display = 'flex';
     if (elements.userNameSpan) elements.userNameSpan.textContent = `${currentUser.name} 님`;
+    if (elements.myPrayersBtn) elements.myPrayersBtn.style.display = 'inline-flex';
   } else {
     if (elements.loginOpenBtn) elements.loginOpenBtn.style.display = 'inline-block';
     if (elements.userProfileArea) elements.userProfileArea.style.display = 'none';
     if (elements.userNameSpan) elements.userNameSpan.textContent = '';
+    if (elements.myPrayersBtn) elements.myPrayersBtn.style.display = 'none';
   }
 }
 

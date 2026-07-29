@@ -17,38 +17,50 @@
 
     <!-- 1. Header & Controls -->
     <header class="app-header">
-      <div class="brand">
-        <div class="brand-icon">✝</div>
-        <div class="brand-title">
-          <h1>청소년부 성경 읽기</h1>
-          <p>매일 말씀으로 삶을 채우는 시간</p>
+      <!-- Topbar: Brand Logo & User Auth -->
+      <div class="header-topbar">
+        <div class="brand">
+          <div class="brand-icon">✝</div>
+          <div class="brand-title">
+            <h1>청소년부 성경 읽기</h1>
+            <p>매일 말씀으로 삶을 채우는 시간</p>
+          </div>
         </div>
-      </div>
 
-      <div class="header-controls">
-        <!-- User Auth Area -->
-        <div class="user-auth-control">
-          <button id="communityDashboardBtn" class="btn-community-stats" title="친구들 현황 및 인기 말씀 보기">📊 함온성 현황</button>
+        <div class="user-auth-area">
           <button id="loginOpenBtn" class="btn-auth btn-login">로그인</button>
           <div id="userProfileArea" class="user-profile-area" style="display: none;">
-            <button id="myPrayersBtn" class="btn-my-prayers" title="작성한 기도 모음 보기">🙏 나의 기도함</button>
             <span id="userNameSpan" class="user-name"></span>
             <button id="logoutBtn" class="btn-auth btn-logout">로그아웃</button>
           </div>
         </div>
+      </div>
 
-        <!-- Font Size Adjuster -->
-        <div class="control-group" title="글자 크기 조절">
-          <button id="fontDecreaseBtn" class="btn-icon" aria-label="글자 크기 축소">A-</button>
-          <button id="fontIncreaseBtn" class="btn-icon" aria-label="글자 크기 확대">A+</button>
+      <!-- Toolbar: Features & View Utilities -->
+      <div class="header-toolbar">
+        <div class="toolbar-nav">
+          <button id="communityDashboardBtn" class="btn-toolbar-nav" title="친구들 현황 및 인기 말씀 보기">
+            <span>📊</span> 함온성 현황
+          </button>
+          <button id="myPrayersBtn" class="btn-toolbar-nav btn-my-prayers" title="작성한 기도 모음 보기" style="display: none;">
+            <span>🙏</span> 나의 기도함
+          </button>
         </div>
 
-        <!-- Theme Selector -->
-        <select id="themeSelect" class="theme-select" aria-label="테마 선택">
-          <option value="light">☀️ 라이트 모드</option>
-          <option value="dark">🌙 다크 모드</option>
-          <option value="paper">📜 페이퍼 모드</option>
-        </select>
+        <div class="toolbar-utils">
+          <!-- Font Size Adjuster -->
+          <div class="control-group" title="글자 크기 조절">
+            <button id="fontDecreaseBtn" class="btn-icon" aria-label="글자 크기 축소">A-</button>
+            <button id="fontIncreaseBtn" class="btn-icon" aria-label="글자 크기 확대">A+</button>
+          </div>
+
+          <!-- Theme Selector -->
+          <select id="themeSelect" class="theme-select" aria-label="테마 선택">
+            <option value="light">☀️ 라이트 모드</option>
+            <option value="dark">🌙 다크 모드</option>
+            <option value="paper">📜 페이퍼 모드</option>
+          </select>
+        </div>
       </div>
     </header>
 
