@@ -58,6 +58,14 @@ try {
     // 날짜 타임스탬프 포맷 생성 (예: 2026. 1. 5)
     if (!empty($input['timestamp'])) {
         $timestampStr = trim($input['timestamp']);
+    } elseif (!empty($input['date'])) {
+        $parts = explode('-', trim($input['date']));
+        if (count($parts) === 3) {
+            $timestampStr = sprintf("%d. %d. %d", (int)$parts[0], (int)$parts[1], (int)$parts[2]);
+        } else {
+            $now = new DateTime();
+            $timestampStr = sprintf("%d. %d. %d", $now->format('Y'), $now->format('n'), $now->format('j'));
+        }
     } else {
         $now = new DateTime();
         $timestampStr = sprintf("%d. %d. %d", $now->format('Y'), $now->format('n'), $now->format('j'));
@@ -69,23 +77,47 @@ try {
         exit();
     }
 
-    $stmt = $pdo->prepare("
-        INSERT INTO `hamonseong_logs` 
-        (`user_id`, `timestamp`, `name`, `daycnt`, `myMessage`, `pray`, `prayForUser`)
-        VALUES (:user_id, :timestamp, :name, :daycnt, :myMessage, :pray, :prayForUser)
-    ");
+    // 기존 기록이 있는지 확인 (user_id와 timestamp 기준)
+    $stmt = $pdo->prepare("SELECT id FROM `hamonseong_logs` WHERE `user_id` = :user_id AND `timestamp` = :timestamp LIMIT 1");
+    $stmt->execute(['user_id' => $userId, 'timestamp' => $timestampStr]);
+    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt->execute([
-        'user_id'     => $userId > 0 ? $userId : null,
-        'timestamp'   => $timestampStr,
-        'name'        => $userName,
-        'daycnt'      => $daycnt,
-        'myMessage'   => $myMessage,
-        'pray'        => $pray,
-        'prayForUser' => $prayForUser
-    ]);
+    if ($existing) {
+        // 기존 기록이 있으면 업데이트 (수정)
+        $stmt = $pdo->prepare("
+            UPDATE `hamonseong_logs` 
+            SET `myMessage` = :myMessage, `pray` = :pray, `prayForUser` = :prayForUser, `name` = :name, `daycnt` = :daycnt
+            WHERE `id` = :id
+        ");
+        $stmt->execute([
+            'myMessage'   => $myMessage,
+            'pray'        => $pray,
+            'prayForUser' => $prayForUser,
+            'name'        => $userName,
+            'daycnt'      => $daycnt,
+            'id'          => $existing['id']
+        ]);
+        $insertedId = $existing['id'];
+    } else {
+        // 없으면 새로 삽입
+        $stmt = $pdo->prepare("
+            INSERT INTO `hamonseong_logs` 
+            (`user_id`, `timestamp`, `name`, `daycnt`, `myMessage`, `pray`, `prayForUser`)
+            VALUES (:user_id, :timestamp, :name, :daycnt, :myMessage, :pray, :prayForUser)
+        ");
 
-    $insertedId = (int)$pdo->lastInsertId();
+        $stmt->execute([
+            'user_id'     => $userId > 0 ? $userId : null,
+            'timestamp'   => $timestampStr,
+            'name'        => $userName,
+            'daycnt'      => $daycnt,
+            'myMessage'   => $myMessage,
+            'pray'        => $pray,
+            'prayForUser' => $prayForUser
+        ]);
+
+        $insertedId = (int)$pdo->lastInsertId();
+    }
 
     http_response_code(201);
     echo json_encode([
