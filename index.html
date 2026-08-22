@@ -12,7 +12,6 @@
 </head>
 
 <body>
-
   <div class="app-container">
 
     <!-- 1. Header & Controls -->
@@ -299,7 +298,23 @@
     </div>
   </div>
 
-  <!-- JavaScript -->
+  <!-- JavaScript (의존 순서 준수)
+       core/     → 앱 기반 (상수·상태·유틸)
+       ui/       → 화면 렌더링
+       features/ → 기능 모듈 (새 기능은 여기에 추가)
+  -->
+  <!-- core: 기반 -->
+  <script src="js/core/constants.js"></script>
+  <script src="js/core/state.js"></script>
+  <script src="js/core/utils.js"></script>
+  <!-- ui: 렌더링 -->
+  <script src="js/ui/renderer.js"></script>
+  <!-- features: 기능별 모듈 -->
+  <script src="js/features/auth.js"></script>
+  <script src="js/features/hamonseong.js"></script>
+  <script src="js/features/prayer.js"></script>
+  <script src="js/features/community.js"></script>
+  <!-- 진입점 -->
   <script src="js/app.js"></script>
 </body>
 
