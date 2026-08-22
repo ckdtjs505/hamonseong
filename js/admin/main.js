@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (typeof loadLogs === 'function') loadLogs(); 
             }
             if (target === 'plans') { 
-                pageTitle.textContent = '성경 읽기 계획 관리'; 
+                pageTitle.textContent = '함온성 계획 관리'; 
                 if (typeof loadPlans === 'function') loadPlans(); 
             }
         });
