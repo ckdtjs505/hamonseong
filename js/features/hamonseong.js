@@ -180,6 +180,7 @@ async function handleCompletionSubmit(e) {
   try {
     const res = await fetch(`${API_BASE_URL}api/save_completion.php`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ myMessage, pray, prayForUser, daycnt: 1 })
     });

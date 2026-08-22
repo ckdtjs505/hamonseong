@@ -17,7 +17,7 @@ async function checkAndRestoreSavedCompletion(dateStr) {
   if (!currentUser) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}api/get_completions.php?date=${dateStr}`);
+    const res = await fetch(`${API_BASE_URL}api/get_completions.php?date=${dateStr}`, { credentials: 'include' });
     if (!res.ok) return;
     const result = await res.json();
 
@@ -113,7 +113,7 @@ async function loadPrayerHistory() {
   `;
 
   try {
-    const res = await fetch(`${API_BASE_URL}api/get_completions.php?type=all`);
+    const res = await fetch(`${API_BASE_URL}api/get_completions.php?type=all`, { credentials: 'include' });
     const result = await res.json();
 
     if (result.status !== 'success' || !result.data || result.data.length === 0) {
@@ -216,6 +216,7 @@ async function deletePrayerRecord(id) {
 
   try {
     const res = await fetch(`${API_BASE_URL}api/delete_completion.php`, {
+      credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })

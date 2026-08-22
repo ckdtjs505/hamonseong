@@ -30,6 +30,7 @@ const elements = {
   loginOpenBtn: document.getElementById('loginOpenBtn'),
   userProfileArea: document.getElementById('userProfileArea'),
   userNameSpan: document.getElementById('userNameSpan'),
+  adminLinkBtn: document.getElementById('adminLinkBtn'),
   logoutBtn: document.getElementById('logoutBtn'),
   authModal: document.getElementById('authModal'),
   authModalCloseBtn: document.getElementById('authModalCloseBtn'),

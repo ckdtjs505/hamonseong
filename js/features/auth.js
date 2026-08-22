@@ -8,7 +8,7 @@
 /** 서버 세션을 확인하고, 로그인 상태이면 UI를 업데이트합니다. */
 async function checkSession() {
   try {
-    const res = await fetch(`${API_BASE_URL}api/check_session.php`);
+    const res = await fetch(`${API_BASE_URL}api/check_session.php`, { credentials: 'include' });
     if (!res.ok) return;
     const data = await res.json();
     if (data.status === 'success' && data.isLoggedIn) {
@@ -154,7 +154,7 @@ async function handleLogin(e) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}api/login.php`, {
+    const res = await fetch(`${API_BASE_URL}api/login.php`, { credentials: 'include', 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -195,7 +195,7 @@ async function handleRegister(e) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}api/register.php`, {
+    const res = await fetch(`${API_BASE_URL}api/register.php`, { credentials: 'include', 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, username, password })
@@ -221,7 +221,7 @@ async function handleRegister(e) {
 /** 로그아웃 핸들러 */
 async function handleLogout() {
   try {
-    const res = await fetch(`${API_BASE_URL}api/logout.php`);
+    const res = await fetch(`${API_BASE_URL}api/logout.php`, { credentials: 'include' });
     const data = await res.json();
 
     currentUser = null;
