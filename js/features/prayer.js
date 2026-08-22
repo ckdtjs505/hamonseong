@@ -17,7 +17,7 @@ async function checkAndRestoreSavedCompletion(dateStr) {
   if (!currentUser) return;
 
   try {
-    const res = await fetch(`api/get_completions.php?date=${dateStr}`);
+    const res = await fetch(`${API_BASE_URL}api/get_completions.php?date=${dateStr}`);
     if (!res.ok) return;
     const result = await res.json();
 
@@ -113,7 +113,7 @@ async function loadPrayerHistory() {
   `;
 
   try {
-    const res = await fetch('api/get_completions.php?type=all');
+    const res = await fetch(`${API_BASE_URL}api/get_completions.php?type=all`);
     const result = await res.json();
 
     if (result.status !== 'success' || !result.data || result.data.length === 0) {
@@ -215,7 +215,7 @@ async function deletePrayerRecord(id) {
   if (!confirm('정말로 이 기도 기록을 삭제하시겠습니까?')) return;
 
   try {
-    const res = await fetch('api/delete_completion.php', {
+    const res = await fetch(`${API_BASE_URL}api/delete_completion.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })

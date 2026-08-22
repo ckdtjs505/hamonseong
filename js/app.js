@@ -121,7 +121,7 @@ async function loadBibleReading(dateStr) {
 
   try {
     // Step 1: 오늘의 읽기 계획 조회
-    const planRes = await fetch(`api/get_plan.php?date=${dateStr}`);
+    const planRes = await fetch(`${API_BASE_URL}api/get_plan.php?date=${dateStr}`);
     if (!planRes.ok) {
       throw new Error(`읽기 표를 불러오는데 실패했습니다. (상태 코드: ${planRes.status})`);
     }
@@ -141,7 +141,7 @@ async function loadBibleReading(dateStr) {
       const start = plan.start || plan.start_chapter || plan.chapter_start || 1;
       const end = plan.end || plan.end_chapter || plan.chapter_end || start;
 
-      return fetch(`api/get_word.php?book=${bookId}&start=${start}&end=${end}`)
+      return fetch(`${API_BASE_URL}api/get_word.php?book=${bookId}&start=${start}&end=${end}`)
         .then(res => {
           if (!res.ok) throw new Error('말씀 본문을 불러오지 못했습니다.');
           return res.json();

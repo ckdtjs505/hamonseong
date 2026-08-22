@@ -46,7 +46,7 @@ function switchDashboardTab(tab) {
 /** 서버에서 커뮤니티 통계를 불러와 렌더링합니다. */
 async function loadCommunityStats() {
   try {
-    const res = await fetch('api/get_community_stats.php');
+    const res = await fetch(`${API_BASE_URL}api/get_community_stats.php`);
     if (!res.ok) return;
     const result = await res.json();
     if (result.status !== 'success' || !result.data) return;

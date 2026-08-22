@@ -36,3 +36,5 @@ const BIBLE_BOOK_IDS = {
   베드로전서: 60, 베드로후서: 61, 요한1서: 62, 요한2서: 63, 요한3서: 64,
   유다서: 65, 요한계시록: 66
 };
+
+const API_BASE_URL = 'https://ckdtjst505.mycafe24.com/';
