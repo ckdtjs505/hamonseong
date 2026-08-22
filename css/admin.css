@@ -1,0 +1,108 @@
+/* Admin Dashboard Specific Styles */
+body { background-color: var(--bg-subtle); }
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+.admin-sidebar {
+  width: 250px;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.admin-sidebar h2 {
+  font-size: 1.25rem;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+}
+.admin-nav-item {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 100%;
+}
+.admin-nav-item:hover, .admin-nav-item.active {
+  background-color: var(--accent-light);
+  color: var(--accent-primary);
+}
+.admin-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.admin-header h1 {
+  font-size: 1.75rem;
+  color: var(--text-main);
+}
+.admin-card {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.admin-table th, .admin-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+.admin-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  background-color: var(--bg-subtle);
+}
+.admin-table tr:hover {
+  background-color: var(--bg-subtle);
+}
+.admin-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+.admin-btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+.admin-btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+.admin-btn-danger {
+  background-color: #ef4444;
+  color: white;
+}
+.admin-btn-danger:hover {
+  background-color: #dc2626;
+}
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-admin { background-color: #fef08a; color: #854d0e; }
+.badge-member { background-color: #e2e8f0; color: #475569; }
