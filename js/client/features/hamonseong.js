@@ -182,7 +182,13 @@ async function handleCompletionSubmit(e) {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ myMessage, pray, prayForUser, daycnt: 1 })
+      body: JSON.stringify({ 
+        myMessage, 
+        pray, 
+        prayForUser, 
+        daycnt: 1,
+        date: getFormattedDate(currentDate)
+      })
     });
 
     const data = await res.json();
