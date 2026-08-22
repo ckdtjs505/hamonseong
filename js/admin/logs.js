@@ -3,10 +3,14 @@
  * 함온성 기록 관리 관련 기능
  */
 
+/**
+ * 서버에서 모든 함온성(말씀 완독) 기록을 불러옵니다.
+ */
 async function loadLogs() {
     try {
         const res = await fetch(API_BASE_URL + 'api/admin/get_logs.php', { credentials: 'include' });
         const data = await res.json();
+        
         if (data.status === 'success') {
             renderLogs(data.data);
         }
@@ -15,6 +19,10 @@ async function loadLogs() {
     }
 }
 
+/**
+ * 불러온 로그 데이터를 테이블에 렌더링합니다.
+ * @param {Array} logs - 로그 객체 배열
+ */
 function renderLogs(logs) {
     const tbody = document.getElementById('logsTableBody');
     tbody.innerHTML = '';
@@ -22,7 +30,7 @@ function renderLogs(logs) {
     logs.forEach(log => {
         const tr = document.createElement('tr');
         
-        // Truncate text for display
+        // 테이블 레이아웃 유지를 위해 긴 텍스트(말씀, 기도)는 30자로 자르고 말줄임표(...) 처리
         const myMsg = log.myMessage ? log.myMessage.substring(0, 30) + (log.myMessage.length > 30 ? '...' : '') : '-';
         const pray = log.pray ? log.pray.substring(0, 30) + (log.pray.length > 30 ? '...' : '') : '-';
 
@@ -46,6 +54,10 @@ function renderLogs(logs) {
     });
 }
 
+/**
+ * 특정 함온성 기록을 삭제합니다.
+ * @param {number} logId - 삭제할 기록 ID
+ */
 window.deleteLog = async (logId) => {
     if (!confirm('이 기록을 정말 삭제하시겠습니까?')) return;
     
@@ -57,9 +69,10 @@ window.deleteLog = async (logId) => {
             body: JSON.stringify({ log_id: logId })
         });
         const data = await res.json();
+        
         if (data.status === 'success') {
             alert('삭제되었습니다.');
-            loadLogs();
+            loadLogs(); // 목록 갱신
         } else {
             alert(data.message);
         }

@@ -6,8 +6,6 @@ require_once __DIR__ . '/../common/cors_session.php';
  */
 header("Content-Type: application/json; charset=UTF-8");
 
-
-
 $_SESSION = array();
 
 if (ini_get("session.use_cookies")) {

@@ -2,13 +2,9 @@
 require_once __DIR__ . '/../common/cors_session.php';
 
 /**
- * admin_save_plan.php
- * 성경 읽기 계획을 추가하거나 수정합니다. (관리자 전용)
+ * 성경 읽기 계획 추가/수정 (관리자 전용)
  */
-
 header("Content-Type: application/json; charset=UTF-8");
-
-
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -26,13 +22,13 @@ try {
     }
 
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-    
-    $id = (int)($input['id'] ?? 0);
+
+    $id       = (int)($input['id'] ?? 0);
     $daycount = (int)($input['daycount'] ?? 0);
-    $date = trim($input['date'] ?? '');
-    $book = trim($input['book'] ?? '');
-    $start = (int)($input['start'] ?? 0);
-    $end = (int)($input['end'] ?? 0);
+    $date     = trim($input['date'] ?? '');
+    $book     = trim($input['book'] ?? '');
+    $start    = (int)($input['start'] ?? 0);
+    $end      = (int)($input['end'] ?? 0);
 
     if (empty($date) || empty($book) || $start <= 0 || $end <= 0) {
         http_response_code(400);
@@ -41,39 +37,25 @@ try {
     }
 
     if ($id > 0) {
-        // Update
+        // 수정
         $stmt = $pdo->prepare("UPDATE `read_plan` SET `daycount` = :daycount, `date` = :date, `book` = :book, `start` = :start, `end` = :end WHERE `id` = :id");
-        $stmt->execute([
-            'daycount' => $daycount,
-            'date' => $date,
-            'book' => $book,
-            'start' => $start,
-            'end' => $end,
-            'id' => $id
-        ]);
+        $stmt->execute(['daycount' => $daycount, 'date' => $date, 'book' => $book, 'start' => $start, 'end' => $end, 'id' => $id]);
     } else {
-        // Insert
+        // 추가
         $stmt = $pdo->prepare("INSERT INTO `read_plan` (`daycount`, `date`, `book`, `start`, `end`) VALUES (:daycount, :date, :book, :start, :end)");
-        $stmt->execute([
-            'daycount' => $daycount,
-            'date' => $date,
-            'book' => $book,
-            'start' => $start,
-            'end' => $end
-        ]);
+        $stmt->execute(['daycount' => $daycount, 'date' => $date, 'book' => $book, 'start' => $start, 'end' => $end]);
     }
 
     http_response_code(200);
     echo json_encode([
-        'status' => 'success',
+        'status'  => 'success',
         'message' => '계획이 저장되었습니다.'
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
-        'status' => 'error',
+        'status'  => 'error',
         'message' => '처리 중 오류가 발생했습니다: ' . $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
-?>

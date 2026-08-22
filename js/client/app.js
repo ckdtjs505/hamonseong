@@ -121,12 +121,14 @@ async function loadBibleReading(dateStr) {
 
   try {
     // Step 1: 오늘의 읽기 계획 조회
+    // 서버(get_plan.php)에 해당 날짜의 계획을 요청합니다.
     const planRes = await fetch(`${API_BASE_URL}api/bible/get_plan.php?date=${dateStr}`, { credentials: 'include' });
     if (!planRes.ok) {
       throw new Error(`읽기 표를 불러오는데 실패했습니다. (상태 코드: ${planRes.status})`);
     }
     const planResult = await planRes.json();
 
+    // 등록된 계획이 없으면 빈 상태 UI를 렌더링하고 종료합니다.
     if (planResult.status !== 'success' || !planResult.data || planResult.data.length === 0) {
       renderEmptyPlanState(dateStr);
       return;
@@ -134,13 +136,16 @@ async function loadBibleReading(dateStr) {
 
     const plans = planResult.data;
 
-    // Step 2: 각 계획 항목의 말씀 구절 조회
+    // Step 2: 각 계획 항목의 말씀 구절 데이터 병렬 조회
+    // 여러 개의 성경 본문을 동시에 불러오기 위해 Promise 배열을 생성합니다.
     const wordPromises = plans.map(plan => {
+      // API 요청 파라미터 정규화 (다양한 필드명 호환)
       const rawBook = plan.book || plan.book_id || 1;
       const bookId = getBookNumericId(rawBook);
       const start = plan.start || plan.start_chapter || plan.chapter_start || 1;
       const end = plan.end || plan.end_chapter || plan.chapter_end || start;
 
+      // get_word.php API로 특정 권, 시작 장, 끝 장의 말씀 데이터를 요청
       return fetch(`${API_BASE_URL}api/bible/get_word.php?book=${bookId}&start=${start}&end=${end}`, { credentials: 'include' })
         .then(res => {
           if (!res.ok) throw new Error('말씀 본문을 불러오지 못했습니다.');
@@ -152,10 +157,13 @@ async function loadBibleReading(dateStr) {
         }));
     });
 
+    // 모든 말씀 데이터를 비동기로 불러올 때까지 대기
     const results = await Promise.all(wordPromises);
+    
+    // 가져온 계획과 말씀 데이터를 화면에 렌더링 (renderer.js 활용)
     renderReadingPlan(plans, results);
 
-    // Step 3: 저장된 완료 기록 복원 (로그인된 경우)
+    // Step 3: 해당 날짜에 저장된 완료 기록이 있는지 확인하고 복원 (로그인된 경우)
     await checkAndRestoreSavedCompletion(dateStr);
 
   } catch (err) {
