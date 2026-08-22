@@ -2,13 +2,9 @@
 require_once __DIR__ . '/../common/cors_session.php';
 
 /**
- * admin_delete_plan.php
- * 성경 읽기 계획을 삭제합니다. (관리자 전용)
+ * 성경 읽기 계획 삭제 (관리자 전용)
  */
-
 header("Content-Type: application/json; charset=UTF-8");
-
-
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -39,15 +35,14 @@ try {
 
     http_response_code(200);
     echo json_encode([
-        'status' => 'success',
+        'status'  => 'success',
         'message' => '계획이 삭제되었습니다.'
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
-        'status' => 'error',
+        'status'  => 'error',
         'message' => '처리 중 오류가 발생했습니다: ' . $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
-?>

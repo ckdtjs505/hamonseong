@@ -6,8 +6,6 @@ require_once __DIR__ . '/../common/cors_session.php';
  */
 header("Content-Type: application/json; charset=UTF-8");
 
-
-
 if (isset($_SESSION['user']) && !empty($_SESSION['user'])) {
     http_response_code(200);
     echo json_encode([

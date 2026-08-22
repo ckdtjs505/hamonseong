@@ -2,13 +2,9 @@
 require_once __DIR__ . '/../common/cors_session.php';
 
 /**
- * admin_update_role.php
- * 사용자 권한을 변경합니다. (관리자 전용)
+ * 사용자 권한 변경 (관리자 전용)
  */
-
 header("Content-Type: application/json; charset=UTF-8");
-
-
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -35,11 +31,11 @@ try {
         exit();
     }
 
-    // 본인의 권한은 변경할 수 없도록 방어
+    // 본인의 권한은 변경 불가
     if ($_SESSION['user']['id'] == $targetUserId) {
-         http_response_code(400);
-         echo json_encode(['status' => 'error', 'message' => '본인의 권한은 변경할 수 없습니다.']);
-         exit();
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => '본인의 권한은 변경할 수 없습니다.']);
+        exit();
     }
 
     $stmt = $pdo->prepare("UPDATE `users` SET `role` = :role WHERE `id` = :id");
@@ -47,15 +43,14 @@ try {
 
     http_response_code(200);
     echo json_encode([
-        'status' => 'success',
+        'status'  => 'success',
         'message' => '권한이 변경되었습니다.'
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
-        'status' => 'error',
+        'status'  => 'error',
         'message' => '처리 중 오류가 발생했습니다: ' . $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
-?>

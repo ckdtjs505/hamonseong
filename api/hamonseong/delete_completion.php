@@ -6,8 +6,6 @@ require_once __DIR__ . '/../common/cors_session.php';
  */
 header("Content-Type: application/json; charset=UTF-8");
 
-
-
 if (!in_array($_SERVER['REQUEST_METHOD'], ['POST', 'DELETE'])) {
     http_response_code(405);
     echo json_encode(['status' => 'error', 'message' => 'POST 또는 DELETE 요청만 허용됩니다.']);
@@ -41,10 +39,7 @@ try {
 
     // 해당 사용자 본인의 기록인지 확인 및 삭제
     $stmt = $pdo->prepare("DELETE FROM `hamonseong_logs` WHERE `id` = :id AND `user_id` = :user_id");
-    $stmt->execute([
-        'id'      => $id,
-        'user_id' => $userId
-    ]);
+    $stmt->execute(['id' => $id, 'user_id' => $userId]);
 
     if ($stmt->rowCount() > 0) {
         http_response_code(200);

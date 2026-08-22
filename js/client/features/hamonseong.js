@@ -10,12 +10,15 @@
 
 /** 함온성 관련 이벤트 리스너를 초기화합니다. */
 function setupHamonseongEvents() {
+  // 구절 선택 바
   if (elements.clearSelectionBtn) {
     elements.clearSelectionBtn.addEventListener('click', clearSelectedVerses);
   }
   if (elements.openCompletionBtn) {
     elements.openCompletionBtn.addEventListener('click', openCompletionModal);
   }
+
+  // 완료 모달
   if (elements.completionModalCloseBtn) {
     elements.completionModalCloseBtn.addEventListener('click', closeCompletionModal);
   }
@@ -30,11 +33,15 @@ function setupHamonseongEvents() {
   if (elements.completionForm) {
     elements.completionForm.addEventListener('submit', handleCompletionSubmit);
   }
-  if (elements.myPrayersBtn) {
-    elements.myPrayersBtn.addEventListener('click', openPrayerHistoryModal);
-  }
+
+  // 완료 배너 → 수정하기
   if (elements.editCompletionBtn) {
     elements.editCompletionBtn.addEventListener('click', openCompletionModal);
+  }
+
+  // 기도 기록 모달
+  if (elements.myPrayersBtn) {
+    elements.myPrayersBtn.addEventListener('click', openPrayerHistoryModal);
   }
   if (elements.prayerHistoryCloseBtn) {
     elements.prayerHistoryCloseBtn.addEventListener('click', closePrayerHistoryModal);
@@ -44,6 +51,8 @@ function setupHamonseongEvents() {
       if (e.target === elements.prayerHistoryModal) closePrayerHistoryModal();
     });
   }
+
+  // 커뮤니티 대시보드 모달
   if (elements.communityDashboardBtn) {
     elements.communityDashboardBtn.addEventListener('click', openCommunityDashboardModal);
   }
@@ -95,7 +104,6 @@ function clearSelectedVerses() {
 function generateFormattedMyMessage() {
   if (selectedVersesMap.size === 0) return '';
 
-  // 성경 권 이름으로 그룹화
   const groupedByBook = {};
   for (const item of selectedVersesMap.values()) {
     if (!groupedByBook[item.bookName]) {
@@ -182,10 +190,10 @@ async function handleCompletionSubmit(e) {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        myMessage, 
-        pray, 
-        prayForUser, 
+      body: JSON.stringify({
+        myMessage,
+        pray,
+        prayForUser,
         daycnt: 1,
         date: getFormattedDate(currentDate)
       })

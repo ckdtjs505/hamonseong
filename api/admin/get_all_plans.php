@@ -2,13 +2,9 @@
 require_once __DIR__ . '/../common/cors_session.php';
 
 /**
- * admin_get_all_plans.php
- * 모든 성경 읽기 계획을 가져옵니다. (관리자 전용)
+ * 모든 성경 읽기 계획 조회 (관리자 전용)
  */
-
 header("Content-Type: application/json; charset=UTF-8");
-
-
 
 require_once __DIR__ . '/check.php';
 requireAdmin();
@@ -26,14 +22,13 @@ try {
     http_response_code(200);
     echo json_encode([
         'status' => 'success',
-        'data' => $plans
+        'data'   => $plans
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
-        'status' => 'error',
+        'status'  => 'error',
         'message' => '데이터를 불러오는 중 오류가 발생했습니다: ' . $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
-?>

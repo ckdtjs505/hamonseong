@@ -1,13 +1,14 @@
 <?php
 require_once __DIR__ . '/../common/cors_session.php';
 
-// 1. CORS 및 JSON 응답 헤더 설정
+/**
+ * 성경 읽기 계획 조회 API
+ *
+ * - ?date=YYYY-MM-DD : 특정 날짜의 계획 조회
+ * - 파라미터 없음     : 오늘 날짜(CURDATE()) 기준 조회
+ */
 header("Content-Type: application/json; charset=UTF-8");
 
-// OPTIONS (Preflight) 요청 들어왔을 때 즉시 종료
-
-
-// 2. 공통 DB 연결 모듈 불러오기
 require_once __DIR__ . '/../common/db_connect.php';
 
 try {
@@ -15,29 +16,28 @@ try {
         throw new Exception("DB 연결 실패");
     }
 
-    // 3. GET 파라미터로 날짜(date)가 주어진 경우 해당 날짜로 조회, 없으면 오늘 날짜(CURDATE()) 조회
+    // 1. 날짜 파라미터 확인 및 유효성 검사 (YYYY-MM-DD 형식)
     if (isset($_GET['date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['date'])) {
-        $sql = "SELECT * FROM `read_plan` WHERE `date` = :date";
-        $stmt = $pdo->prepare($sql);
+        // 지정된 날짜의 읽기 계획을 가져옵니다.
+        $stmt = $pdo->prepare("SELECT * FROM `read_plan` WHERE `date` = :date");
         $stmt->execute(['date' => $_GET['date']]);
     } else {
-        $sql = "SELECT * FROM `read_plan` WHERE `date` = CURDATE()";
-        $stmt = $pdo->prepare($sql);
+        // 파라미터가 없거나 유효하지 않으면 오늘 날짜(CURDATE())의 계획을 가져옵니다.
+        $stmt = $pdo->prepare("SELECT * FROM `read_plan` WHERE `date` = CURDATE()");
         $stmt->execute();
     }
 
+    // 2. 결과 가져오기
     $plans = $stmt->fetchAll();
 
-    // 4. 성공 응답 (JSON)
     http_response_code(200);
     echo json_encode([
         'status' => 'success',
         'count'  => count($plans),
         'data'   => $plans
-    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
-    // 서버 오류 예외 처리
     http_response_code(500);
     echo json_encode([
         'status'  => 'error',

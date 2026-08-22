@@ -1,16 +1,17 @@
 <?php
+/**
+ * check.php
+ * 관리자 권한 확인을 위한 유틸리티 파일
+ */
 require_once __DIR__ . '/../common/cors_session.php';
 
-/**
- * admin_check.php
- * 관리자 권한 확인을 위한 유틸리티 파일입니다.
- */
-
-function isAdmin() {
-    return isset($_SESSION['user']) && isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin';
+function isAdmin(): bool
+{
+    return isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin';
 }
 
-function requireAdmin() {
+function requireAdmin(): void
+{
     if (!isAdmin()) {
         http_response_code(403);
         echo json_encode([
@@ -20,4 +21,3 @@ function requireAdmin() {
         exit();
     }
 }
-?>

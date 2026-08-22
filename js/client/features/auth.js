@@ -154,8 +154,9 @@ async function handleLogin(e) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}api/auth/login.php`, { credentials: 'include', 
+    const res = await fetch(`${API_BASE_URL}api/auth/login.php`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
@@ -195,8 +196,9 @@ async function handleRegister(e) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}api/auth/register.php`, { credentials: 'include', 
+    const res = await fetch(`${API_BASE_URL}api/auth/register.php`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, username, password })
     });
