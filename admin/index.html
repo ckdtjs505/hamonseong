@@ -17,7 +17,7 @@
       <h2>⚙️ 관리자 대시보드</h2>
       <button class="admin-nav-item active" data-target="users">사용자 관리</button>
       <button class="admin-nav-item" data-target="logs">함온성 기록 관리</button>
-      <button class="admin-nav-item" data-target="plans">계획 관리</button>
+      <button class="admin-nav-item" data-target="plans">함온성 계획 관리</button>
       <div style="flex-grow: 1;"></div>
       <button class="admin-nav-item" onclick="window.location.href='../index.html'">돌아가기</button>
     </aside>
@@ -82,18 +82,18 @@
       <!-- Plans Section -->
       <section id="plansSection" class="admin-card" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3>성경 읽기 계획 관리</h3>
+          <h3>함온성 계획 (read_plan) 관리</h3>
           <button class="admin-btn admin-btn-primary" onclick="openPlanModal()">+ 새 계획 추가</button>
         </div>
         <div style="overflow-x: auto;">
           <table class="admin-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>날짜</th>
-                <th>성경 번호 (Book ID)</th>
-                <th>시작 장</th>
-                <th>끝 장</th>
+                <th onclick="sortPlans('daycount')" style="cursor: pointer;" title="클릭하여 정렬">일차(Day) ↕️</th>
+                <th onclick="sortPlans('date')" style="cursor: pointer;" title="클릭하여 정렬">날짜 ↕️</th>
+                <th onclick="sortPlans('book')" style="cursor: pointer;" title="클릭하여 정렬">성경 권 (Book) ↕️</th>
+                <th onclick="sortPlans('start')" style="cursor: pointer;" title="클릭하여 정렬">시작 장 ↕️</th>
+                <th onclick="sortPlans('end')" style="cursor: pointer;" title="클릭하여 정렬">끝 장 ↕️</th>
                 <th>관리</th>
               </tr>
             </thead>
@@ -113,13 +113,17 @@
       <form id="planForm">
         <input type="hidden" id="planId">
         <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem;">일차 (Daycount)</label>
+          <input type="number" id="planDaycount" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+        </div>
+        <div style="margin-bottom: 1rem;">
           <label style="display: block; margin-bottom: 0.5rem;">날짜</label>
           <input type="date" id="planDate" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
         </div>
         <div style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 0.5rem;">성경 권 (Book ID: 1~66)</label>
-          <input type="number" id="planBook" min="1" max="66" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
-          <small style="color: var(--text-muted); display: block; margin-top: 4px;">* 창세기=1, 출애굽기=2, ... 마태복음=40 등</small>
+          <label style="display: block; margin-bottom: 0.5rem;">성경 권 (예: 창세기, 1 등)</label>
+          <input type="text" id="planBook" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+          <small style="color: var(--text-muted); display: block; margin-top: 4px;">* '창세기'와 같은 이름이나 숫자 ID를 입력할 수 있습니다.</small>
         </div>
         <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
           <div style="flex: 1;">

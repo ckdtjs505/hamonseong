@@ -28,12 +28,13 @@ try {
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
     
     $id = (int)($input['id'] ?? 0);
+    $daycount = (int)($input['daycount'] ?? 0);
     $date = trim($input['date'] ?? '');
-    $book = (int)($input['book'] ?? 0);
+    $book = trim($input['book'] ?? '');
     $start = (int)($input['start'] ?? 0);
     $end = (int)($input['end'] ?? 0);
 
-    if (empty($date) || $book <= 0 || $start <= 0 || $end <= 0) {
+    if (empty($date) || empty($book) || $start <= 0 || $end <= 0) {
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => '모든 값을 올바르게 입력해주세요.']);
         exit();
@@ -41,8 +42,9 @@ try {
 
     if ($id > 0) {
         // Update
-        $stmt = $pdo->prepare("UPDATE `read_plan` SET `date` = :date, `book` = :book, `start` = :start, `end` = :end WHERE `id` = :id");
+        $stmt = $pdo->prepare("UPDATE `read_plan` SET `daycount` = :daycount, `date` = :date, `book` = :book, `start` = :start, `end` = :end WHERE `id` = :id");
         $stmt->execute([
+            'daycount' => $daycount,
             'date' => $date,
             'book' => $book,
             'start' => $start,
@@ -51,8 +53,9 @@ try {
         ]);
     } else {
         // Insert
-        $stmt = $pdo->prepare("INSERT INTO `read_plan` (`date`, `book`, `start`, `end`) VALUES (:date, :book, :start, :end)");
+        $stmt = $pdo->prepare("INSERT INTO `read_plan` (`daycount`, `date`, `book`, `start`, `end`) VALUES (:daycount, :date, :book, :start, :end)");
         $stmt->execute([
+            'daycount' => $daycount,
             'date' => $date,
             'book' => $book,
             'start' => $start,
