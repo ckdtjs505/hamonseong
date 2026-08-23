@@ -6,6 +6,7 @@
 // ── 전역 상태 ──────────────────────────────────────────────
 let currentDate = new Date();
 let currentFontSize = parseFloat(localStorage.getItem('bible_font_size')) || 1.125;
+let currentVersion = localStorage.getItem('bible_version') || 'woori';
 let currentUser = null;
 const selectedVersesMap = new Map();
 
@@ -13,6 +14,7 @@ const selectedVersesMap = new Map();
 const elements = {
   // 공통 UI
   themeSelect: document.getElementById('themeSelect'),
+  versionSelect: document.getElementById('versionSelect'),
   fontDecreaseBtn: document.getElementById('fontDecreaseBtn'),
   fontIncreaseBtn: document.getElementById('fontIncreaseBtn'),
   prevDateBtn: document.getElementById('prevDateBtn'),

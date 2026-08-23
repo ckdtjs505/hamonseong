@@ -41,9 +41,19 @@ try {
     $realStart = min($start, $end);
     $realEnd   = max($start, $end);
 
-    // 4. 데이터베이스 쿼리 실행: 장(chapter) 범위로 구절 검색
+    // 4. 버전 파라미터 처리 및 테이블 이름 설정
+    $versionParam = $_GET['version'] ?? 'woori';
+    $allowedVersions = [
+        'woori' => 'bibles_woori',
+        'krv' => 'bibles_krv',
+        'shg' => 'bibles_shg'
+    ];
+    $tableName = $allowedVersions[$versionParam] ?? 'bibles_woori';
+
+    // 5. 데이터베이스 쿼리 실행: 장(chapter) 범위로 구절 검색
+    // $tableName은 허용된 문자열 중 하나임이 보장되므로 안전합니다.
     $stmt = $pdo->prepare("
-        SELECT * FROM `bibles_woori`
+        SELECT * FROM `$tableName`
         WHERE `book` = :book AND `chapter` >= :start AND `chapter` <= :end
     ");
     
