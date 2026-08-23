@@ -23,6 +23,9 @@ function initApp() {
   document.documentElement.setAttribute('data-theme', savedTheme);
   if (elements.themeSelect) elements.themeSelect.value = savedTheme;
 
+  // 버전 복원
+  if (elements.versionSelect) elements.versionSelect.value = currentVersion;
+
   // 폰트 크기 복원
   document.documentElement.style.setProperty('--bible-font-size', `${currentFontSize}rem`);
 
@@ -33,6 +36,14 @@ function initApp() {
       const theme = e.target.value;
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('bible_theme', theme);
+    });
+  }
+
+  if (elements.versionSelect) {
+    elements.versionSelect.addEventListener('change', (e) => {
+      currentVersion = e.target.value;
+      localStorage.setItem('bible_version', currentVersion);
+      updateDateView(); // Reload the verses with the new version
     });
   }
 
@@ -146,7 +157,7 @@ async function loadBibleReading(dateStr) {
       const end = plan.end || plan.end_chapter || plan.chapter_end || start;
 
       // get_word.php API로 특정 권, 시작 장, 끝 장의 말씀 데이터를 요청
-      return fetch(`${API_BASE_URL}api/bible/get_word.php?book=${bookId}&start=${start}&end=${end}`, { credentials: 'include' })
+      return fetch(`${API_BASE_URL}api/bible/get_word.php?book=${bookId}&start=${start}&end=${end}&version=${currentVersion}`, { credentials: 'include' })
         .then(res => {
           if (!res.ok) throw new Error('말씀 본문을 불러오지 못했습니다.');
           return res.json();
