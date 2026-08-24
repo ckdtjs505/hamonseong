@@ -37,4 +37,4 @@ const BIBLE_BOOK_IDS = {
   유다서: 65, 요한계시록: 66
 };
 
-const API_BASE_URL = 'https://ckdtjst505.mycafe24.com/';
+const API_BASE_URL = 'https://hamonseong.com/';
