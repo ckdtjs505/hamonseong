@@ -9,6 +9,8 @@
 function openCommunityDashboardModal() {
   if (elements.communityDashboardModal) {
     elements.communityDashboardModal.style.display = 'flex';
+    // 모바일에서 바텀시트 열릴 때 배경 스크롤 방지
+    document.body.style.overflow = 'hidden';
   }
   switchDashboardTab('friends');
   loadCommunityStats();
@@ -18,6 +20,8 @@ function openCommunityDashboardModal() {
 function closeCommunityDashboardModal() {
   if (elements.communityDashboardModal) {
     elements.communityDashboardModal.style.display = 'none';
+    // 바텀시트 닫힐 때 배경 스크롤 복원
+    document.body.style.overflow = '';
   }
 }
 

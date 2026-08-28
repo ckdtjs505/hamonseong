@@ -92,6 +92,7 @@ async function openPrayerHistoryModal() {
 
   if (elements.prayerHistoryModal) {
     elements.prayerHistoryModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 모바일 배경 스크롤 방지
   }
 
   loadPrayerHistory();
@@ -101,6 +102,7 @@ async function openPrayerHistoryModal() {
 function closePrayerHistoryModal() {
   if (elements.prayerHistoryModal) {
     elements.prayerHistoryModal.style.display = 'none';
+    document.body.style.overflow = ''; // 배경 스크롤 복원
   }
 }
 

@@ -154,6 +154,7 @@ function openCompletionModal() {
 
   if (elements.completionModal) {
     elements.completionModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 모바일 배경 스크롤 방지
   }
 }
 
@@ -161,6 +162,7 @@ function openCompletionModal() {
 function closeCompletionModal() {
   if (elements.completionModal) {
     elements.completionModal.style.display = 'none';
+    document.body.style.overflow = ''; // 배경 스크롤 복원
   }
 }
 

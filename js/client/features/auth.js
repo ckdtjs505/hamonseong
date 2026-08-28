@@ -79,6 +79,7 @@ function setupAuthEvents() {
 function openAuthModal(defaultTab = 'login') {
   if (elements.authModal) {
     elements.authModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 모바일 배경 스크롤 방지
     clearAuthErrors();
     switchAuthTab(defaultTab);
   }
@@ -88,6 +89,7 @@ function openAuthModal(defaultTab = 'login') {
 function closeAuthModal() {
   if (elements.authModal) {
     elements.authModal.style.display = 'none';
+    document.body.style.overflow = ''; // 배경 스크롤 복원
     clearAuthErrors();
   }
 }
