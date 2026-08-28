@@ -4,8 +4,8 @@
  */
 
 let allPlans = [];
-// 현재 정렬 상태를 저장하는 객체 (기본값: 날짜 내림차순)
-let currentSort = { column: 'date', order: 'desc' };
+// 현재 정렬 상태를 저장하는 객체 (기본값: 일차 오름차순)
+let currentSort = { column: 'daycount', order: 'asc' };
 
 /** 서버에서 모든 성경 읽기 계획을 불러옵니다. */
 async function loadPlans() {
