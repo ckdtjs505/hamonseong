@@ -45,7 +45,7 @@ function renderEmptyPlanState(dateStr) {
 
     // 오늘이 아닐 때만 '오늘 날짜로 이동' 버튼 표시, 오늘이면 '친구들 현황 보기' 유도
     const buttonHtml = isToday 
-      ? `<button class="btn-retry" onclick="if(typeof openCommunityDashboardModal === 'function') openCommunityDashboardModal()" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><span style="margin-right:0.3rem">👥</span> 친구들 묵상 보기</button>` 
+      ? `<button class="btn-retry" onclick="if(typeof openCommunityDashboardModal === 'function') openCommunityDashboardModal()"><span style="margin-right:0.3rem">👥</span> 친구들 묵상 보기</button>` 
       : `<button class="btn-retry" onclick="currentDate=new Date(); updateDateView();">오늘 날짜로 이동</button>`;
 
     elements.readingContainer.innerHTML = `
