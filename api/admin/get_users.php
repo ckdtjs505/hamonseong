@@ -15,7 +15,7 @@ try {
         throw new Exception("데이터베이스 연결에 실패했습니다.");
     }
 
-    $stmt = $pdo->prepare("SELECT `id`, `username`, `name`, `role`, `created_at` FROM `users` ORDER BY `created_at` DESC");
+    $stmt = $pdo->prepare("SELECT `id`, `username`, `name`, `class_group`, `role`, `created_at` FROM `users` ORDER BY `created_at` DESC");
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
