@@ -455,14 +455,14 @@ body {
 
 .verse-item {
   position: relative;
-  padding: 0.35rem 0.5rem;
-  border-radius: 6px;
-  transition: background-color 0.15s ease;
-  cursor: pointer;
-  margin-bottom: 0.25rem;
   display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  margin-bottom: 0.15rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .verse-item:hover {
@@ -471,16 +471,24 @@ body {
 
 .verse-item.highlighted {
   background-color: var(--verse-highlight-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  /* Subtle pop for selected verses */
 }
 
 .verse-num {
   font-family: var(--font-ui);
-  font-size: 0.82em;
-  font-weight: 700;
-  color: var(--verse-num-color);
+  font-size: 0.75rem;
+  /* Small and precise */
+  font-weight: 800;
+  color: var(--text-muted);
+  /* Subtle grey so it doesn't distract */
+  opacity: 0.8;
   user-select: none;
-  min-width: 1.6em;
+  min-width: 1.3rem;
   text-align: right;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+  /* Visually align with text cap height */
 }
 
 .verse-text {
@@ -687,8 +695,8 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
   background-color: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px);
   z-index: 1000;
@@ -1622,14 +1630,15 @@ body {
 
   /* Reading Container Mobile Touch */
   .reading-container {
-    padding: 1.25rem 0.85rem;
+    padding: 1.25rem 1rem;
     border-radius: 14px;
   }
 
   .verse-item {
-    padding: 0.6rem 0.5rem;
-    margin-bottom: 0.35rem;
-    border-radius: 8px;
+    padding: 0.35rem 0.2rem;
+    margin-bottom: 0.1rem;
+    border-radius: 6px;
+    gap: 0.4rem;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -1639,13 +1648,17 @@ body {
   }
 
   .verse-num {
-    font-size: 0.85em;
-    min-width: 1.7em;
+    font-size: 0.7rem;
+    /* Even smaller and subtler on mobile */
+    min-width: 1.15rem;
+    /* Tighter column */
+    margin-top: 0.2rem;
   }
 
   .verse-text {
     font-size: 1.05rem;
-    line-height: 1.8;
+    line-height: 1.7;
+    /* Optimize readability */
   }
 
   /* Mobile Sheet Modal Styles */
@@ -1660,12 +1673,13 @@ body {
   .modal-card-dashboard {
     width: 100%;
     max-width: 100%;
-    max-height: 92vh;
+    max-height: 90dvh;
+    overflow-y: auto;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-    padding: 1.5rem 1.1rem 2rem 1.1rem;
+    padding: 1.5rem 1.1rem calc(2rem + env(safe-area-inset-bottom)) 1.1rem;
     animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
