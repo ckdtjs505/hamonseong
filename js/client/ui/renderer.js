@@ -32,12 +32,28 @@ function renderLoadingState() {
 function renderEmptyPlanState(dateStr) {
   if (elements.planSummaryCard) elements.planSummaryCard.style.display = 'none';
   if (elements.readingContainer) {
+    // 현재 날짜(오늘)인지 확인
+    const todayStr = getFormattedDate(new Date());
+    const isToday = dateStr === todayStr;
+
+    // 안내 메시지 분기
+    const iconHtml = isToday ? '☕️' : '📅';
+    const title = isToday ? '오늘은 쉬어가는 날입니다 🌿' : `${dateStr} 읽기표가 없습니다`;
+    const desc = isToday 
+      ? '오늘은 예정된 성경 읽기(함온성) 일정이 없습니다. 그동안 읽은 말씀을 묵상하며 평안한 하루 보내세요!'
+      : '해당 날짜에 등록된 성경 읽기 계획이 없습니다. 일정이 있는 다른 날짜를 선택해 주세요.';
+
+    // 오늘이 아닐 때만 '오늘 날짜로 이동' 버튼 표시, 오늘이면 '친구들 현황 보기' 유도
+    const buttonHtml = isToday 
+      ? `<button class="btn-retry" onclick="if(typeof openCommunityDashboardModal === 'function') openCommunityDashboardModal()" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><span style="margin-right:0.3rem">👥</span> 친구들 묵상 보기</button>` 
+      : `<button class="btn-retry" onclick="currentDate=new Date(); updateDateView();">오늘 날짜로 이동</button>`;
+
     elements.readingContainer.innerHTML = `
-      <div class="empty-state">
-        <span class="state-icon">📖</span>
-        <div class="state-title">${dateStr} 읽기표가 존재하지 않습니다</div>
-        <div class="state-desc">해당 날짜에 등록된 성경 읽기 계획이 없습니다. 상단의 날짜 이동 버튼을 이용하여 다른 날짜를 선택해 주세요.</div>
-        <button class="btn-retry" onclick="currentDate=new Date(); updateDateView();">오늘 날짜로 이동</button>
+      <div class="empty-state" style="padding: 4rem 1.5rem;">
+        <span class="state-icon" style="font-size: 3.2rem; margin-bottom: 1.25rem;">${iconHtml}</span>
+        <div class="state-title" style="font-size: 1.2rem; margin-bottom: 0.75rem;">${title}</div>
+        <div class="state-desc" style="line-height: 1.6; margin-bottom: 2rem;">${desc}</div>
+        ${buttonHtml}
       </div>
     `;
   }
