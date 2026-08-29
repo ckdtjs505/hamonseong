@@ -8,16 +8,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const checkRes = await fetch(API_BASE_URL + 'api/auth/check_session.php', { credentials: 'include' });
     const checkData = await checkRes.json();
 
-    // 비로그인 상태이거나 권한이 'admin'이 아닌 경우 메인 페이지로 강제 리다이렉트
-    if (!checkData.isLoggedIn || checkData.user.role !== 'admin') {
-        alert('관리자 권한이 없습니다.');
+    // 비로그인 상태이거나 권한이 'admin' 또는 'leader'가 아닌 경우 메인 페이지로 강제 리다이렉트
+    if (!checkData.isLoggedIn || !['admin', 'leader'].includes(checkData.user.role)) {
+        alert('접근 권한이 없습니다.');
         window.location.href = '../index.html';
         return;
     }
 
     // 전역 변수에 현재 사용자 정보 저장 (다른 관리자 스크립트에서 활용)
     window.currentUser = checkData.user;
-    document.getElementById('adminUserArea').textContent = `${window.currentUser.name} 관리자님 환영합니다.`;
+
+    // 역할에 따른 환영 메시지 표시
+    const roleLabel = checkData.user.role === 'admin' ? '관리자' : '리더';
+    document.getElementById('adminUserArea').textContent = `${window.currentUser.name} ${roleLabel}님 환영합니다.`;
+
+    // leader인 경우 사용자 관리 탭 숨김 처리 (사용자 관리는 admin 전용)
+    if (checkData.user.role === 'leader') {
+        const usersNavBtn = document.querySelector('.admin-nav-item[data-target="users"]');
+        if (usersNavBtn) usersNavBtn.style.display = 'none';
+    }
 
     // 2. 네비게이션 탭 이벤트 설정
     const navItems = document.querySelectorAll('.admin-nav-item[data-target]');
@@ -74,8 +83,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 3. 초기 화면 설정: 기본적으로 사용자 관리(users) 탭을 로드
-    if (typeof loadUsers === 'function') {
-        loadUsers();
+    // 3. 초기 화면 설정
+    //    - admin: 사용자 관리(users) 탭으로 시작
+    //    - leader: 반별 진행사항(progress) 탭으로 시작
+    if (checkData.user.role === 'leader') {
+        // leader 진입 시 기본 탭을 진행사항으로 설정
+        const progressNavBtn = document.querySelector('.admin-nav-item[data-target="progress"]');
+        if (progressNavBtn) progressNavBtn.click();
+    } else {
+        if (typeof loadUsers === 'function') {
+            loadUsers();
+        }
     }
 });

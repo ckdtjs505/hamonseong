@@ -1,7 +1,7 @@
 <?php
 /**
  * get_progress.php
- * 반별 진행사항 조회 API (관리자 전용)
+ * 반별 진행사항 조회 API (관리자 및 리더 접근 가능)
  * 
  * 모든 학생(admin 제외)의 정보, 함온성 기록, 읽기 계획을 한 번에 반환합니다.
  * 프론트엔드에서 이 데이터를 활용하여 반별 진행사항 O/X 표를 렌더링합니다.
@@ -16,7 +16,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 // 관리자 권한 확인
 require_once __DIR__ . '/check.php';
-requireAdmin();
+requireAdminOrLeader();
 require_once __DIR__ . '/../common/ensure_tables.php';
 
 try {
@@ -31,7 +31,7 @@ try {
     // 1. 모든 학생/일반 사용자 조회 (admin 제외)
     //    - class_group이 NULL인 사용자가 뒤로 가도록 정렬
     //    - 같은 반 내에서는 이름순 정렬
-    $stmtUsers = $pdo->prepare("SELECT `id`, `name`, `username`, `class_group` FROM `users` WHERE `role` != 'admin' ORDER BY `class_group` IS NULL, `class_group`, `name`");
+    $stmtUsers = $pdo->prepare("SELECT `id`, `name`, `username`, `class_group` FROM `users` WHERE `role` = 'member' ORDER BY `class_group` IS NULL, `class_group`, `name`");
     $stmtUsers->execute();
     $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
 

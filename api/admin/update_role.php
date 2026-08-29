@@ -25,7 +25,7 @@ try {
     $targetUserId = (int)($input['user_id'] ?? 0);
     $newRole = trim($input['role'] ?? '');
 
-    if ($targetUserId <= 0 || !in_array($newRole, ['member', 'admin'])) {
+    if ($targetUserId <= 0 || !in_array($newRole, ['member', 'leader', 'admin'])) {
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => '잘못된 요청입니다.']);
         exit();

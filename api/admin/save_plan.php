@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../common/cors_session.php';
 
 /**
- * 성경 읽기 계획 추가/수정 (관리자 전용)
+ * 성경 읽기 계획 추가/수정 (관리자 및 리더 접근 가능)
  */
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once __DIR__ . '/check.php';
-requireAdmin();
+requireAdminOrLeader();
 require_once __DIR__ . '/../common/db_connect.php';
 
 try {

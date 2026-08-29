@@ -38,8 +38,17 @@ function renderUsers(users) {
         const tr = document.createElement('tr');
 
         // 역할(Role)에 따른 뱃지 스타일과 텍스트 설정
-        const badgeClass = user.role === 'admin' ? 'badge-admin' : 'badge-member';
-        const roleText = user.role === 'admin' ? '관리자' : '일반회원';
+        let badgeClass, roleText;
+        if (user.role === 'admin') {
+            badgeClass = 'badge-admin';
+            roleText = '관리자';
+        } else if (user.role === 'leader') {
+            badgeClass = 'badge-leader';
+            roleText = '리더';
+        } else {
+            badgeClass = 'badge-member';
+            roleText = '일반회원';
+        }
 
         // 현재 로그인한 본인 계정인 경우 권한변경 및 삭제 버튼 비활성화 처리
         const isSelf = window.currentUser && window.currentUser.id == user.id;
@@ -61,9 +70,17 @@ function renderUsers(users) {
             <td><span class="badge ${badgeClass}">${roleText}</span></td>
             <td>${new Date(user.created_at).toLocaleString()}</td>
             <td>
-                <button class="admin-btn admin-btn-primary" onclick="toggleRole(${user.id}, '${user.role === 'admin' ? 'member' : 'admin'}')" ${disabledAttr}>
-                    권한변경
-                </button>
+                <!-- 권한 변경: 드롭다운 셀렉트로 3단계 중 선택 -->
+                <select
+                    class="role-select"
+                    data-user-id="${user.id}"
+                    ${disabledAttr}
+                    onchange="changeRole(${user.id}, this.value, this)"
+                    style="padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-size: 0.85rem; cursor: pointer;">
+                    <option value="member" ${user.role === 'member' ? 'selected' : ''}>일반회원</option>
+                    <option value="leader" ${user.role === 'leader' ? 'selected' : ''}>리더</option>
+                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>관리자</option>
+                </select>
                 <button class="admin-btn admin-btn-danger" onclick="deleteUser(${user.id})" ${disabledAttr}>
                     삭제
                 </button>
@@ -218,12 +235,22 @@ async function saveUserClass(userId, classGroup, overlay) {
 }
 
 /**
- * 사용자의 권한을 변경합니다 (일반회원 <-> 관리자)
+ * 사용자의 권한을 드롭다운 셀렉트에서 선택한 값으로 변경합니다.
  * @param {number} userId - 대상 사용자 ID
- * @param {string} newRole - 변경할 권한 ('member' 또는 'admin')
+ * @param {string} newRole - 변경할 권한 ('member', 'leader', 'admin')
+ * @param {HTMLSelectElement} selectEl - 변경 취소 시 원래 값으로 되돌릴 셀렉트 요소
  */
-window.toggleRole = async (userId, newRole) => {
-    if (!confirm(`해당 사용자의 권한을 '${newRole}'(으)로 변경하시겠습니까?`)) return;
+window.changeRole = async (userId, newRole, selectEl) => {
+    const roleLabels = { member: '일반회원', leader: '리더', admin: '관리자' };
+    const prevValue = [...selectEl.options].find(o => o.defaultSelected)?.value
+        || selectEl.dataset.prevRole
+        || 'member';
+
+    if (!confirm(`해당 사용자의 권한을 '${roleLabels[newRole]}'(으)로 변경하시겠습니까?`)) {
+        // 취소 시 이전 값으로 되돌리기
+        selectEl.value = prevValue;
+        return;
+    }
 
     try {
         const res = await fetch(API_BASE_URL + 'api/admin/update_role.php', {
@@ -235,13 +262,14 @@ window.toggleRole = async (userId, newRole) => {
         const data = await res.json();
 
         if (data.status === 'success') {
-            alert('권한이 변경되었습니다.');
-            loadUsers(); // 목록 갱신
+            loadUsers(); // 목록 갱신 (뱃지 색상도 함께 업데이트)
         } else {
             alert(data.message);
+            selectEl.value = prevValue;
         }
     } catch (err) {
         console.error(err);
+        selectEl.value = prevValue;
     }
 };
 

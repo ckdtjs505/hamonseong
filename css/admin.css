@@ -104,7 +104,8 @@ body { background-color: var(--bg-subtle); }
   font-size: 0.75rem;
   font-weight: 600;
 }
-.badge-admin { background-color: #fef08a; color: #854d0e; }
+.badge-admin  { background-color: #fef08a; color: #854d0e; }
+.badge-leader { background-color: #bbf7d0; color: #166534; }
 .badge-member { background-color: #e2e8f0; color: #475569; }
 
 /* ===== 반(Class) 수정 모달 스타일 ===== */

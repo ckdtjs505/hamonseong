@@ -2,12 +2,12 @@
 require_once __DIR__ . '/../common/cors_session.php';
 
 /**
- * 함온성 로그 전체 조회 (관리자 전용)
+ * 함온성 로그 전체 조회 (관리자 및 리더 접근 가능)
  */
 header("Content-Type: application/json; charset=UTF-8");
 
 require_once __DIR__ . '/check.php';
-requireAdmin();
+requireAdminOrLeader();
 require_once __DIR__ . '/../common/db_connect.php';
 
 try {
