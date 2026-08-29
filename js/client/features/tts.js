@@ -210,13 +210,15 @@ function ttsTogglePlayPause() {
     return;
   }
   if (ttsState.isPaused) {
-    window.speechSynthesis.resume();
+    // 안드로이드 기기 버그 대응: resume() 대신 중단된 구절부터 새롭게 _ttsSpeak 호출
     ttsState.isPaused  = false;
     ttsState.isPlaying = true;
     _ttsUpdateIcon(true);
     _keepAliveStart();
+    _ttsSpeak(ttsState.currentIndex);
   } else {
-    window.speechSynthesis.pause();
+    // 안드로이드 기기 버그 대응: pause() 대신 cancel()을 사용하여 완전히 끊음
+    _ttsCancel();
     ttsState.isPaused  = true;
     ttsState.isPlaying = false;
     _ttsUpdateIcon(false);
