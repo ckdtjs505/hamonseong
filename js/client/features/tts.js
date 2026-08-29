@@ -55,8 +55,7 @@ function setupTTSEvents() {
       if (ttsState.isPlaying) {
         const idx = ttsState.currentIndex;
         _ttsCancel();
-        // 사용자 제스처 콘텍스트에서 호출됐으므로 짧은 delay 후 재개
-        setTimeout(() => _ttsSpeak(idx), 200);
+        _ttsSpeak(idx);
       }
     });
   }
@@ -68,7 +67,7 @@ function setupTTSEvents() {
       const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
       const idx   = Math.floor(ratio * ttsState.verseList.length);
       _ttsCancel();
-      setTimeout(() => _ttsSpeak(idx), 200);
+      _ttsSpeak(idx);
     });
   }
 
@@ -141,9 +140,9 @@ function startFullTTS() {
   _ttsUpdateIcon(false);
   showToast('🔊 말씀 읽기를 시작합니다...');
 
-  // ★ cancel() 완료 대기 후 재생 시작
-  //   async/await 대신 setTimeout 사용 (유저 제스처 콘텍스트 유지)
-  setTimeout(() => _ttsSpeak(0), 200);
+  // ★ macOS/iOS Safari는 사용자 제스처(동기 콜백) 내에서 speak()를 호출해야 함.
+  // setTimeout을 사용하면 권한이 유실되어 묵음 처리됨.
+  _ttsSpeak(0);
 }
 
 // ── 재생 엔진 (완전 동기) ────────────────────────────────────
@@ -188,8 +187,15 @@ function _ttsSpeak(index) {
   };
 
   utterance.onerror = (e) => {
-    if (ttsState.generation !== myGen) return;
-    if (e.error === 'interrupted' || e.error === 'canceled') return;
+    if (ttsState.generation !== myGen) return; // We explicitly canceled
+    if (ttsState.isPaused) return;             // User paused
+
+    if (e.error === 'interrupted' || e.error === 'canceled') {
+      // Browser interrupted unexpectedly (e.g., due to clicking a verse on Safari)
+      // Call speak again synchronously to resume from the current verse.
+      _ttsSpeak(index);
+      return;
+    }
     console.warn('[TTS] error:', e.error);
   };
 
