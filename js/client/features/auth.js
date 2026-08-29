@@ -30,11 +30,20 @@ function updateAuthUI() {
     if (elements.userProfileArea) elements.userProfileArea.style.display = 'flex';
     if (elements.userNameSpan) elements.userNameSpan.textContent = `${currentUser.name} 님`;
     if (elements.myPrayersBtn) elements.myPrayersBtn.style.display = 'inline-flex';
+    
+    if (elements.adminLinkBtn) {
+      if (currentUser.role === 'admin' || currentUser.role === 'leader') {
+        elements.adminLinkBtn.style.display = 'inline-block';
+      } else {
+        elements.adminLinkBtn.style.display = 'none';
+      }
+    }
   } else {
     if (elements.loginOpenBtn) elements.loginOpenBtn.style.display = 'inline-block';
     if (elements.userProfileArea) elements.userProfileArea.style.display = 'none';
     if (elements.userNameSpan) elements.userNameSpan.textContent = '';
     if (elements.myPrayersBtn) elements.myPrayersBtn.style.display = 'none';
+    if (elements.adminLinkBtn) elements.adminLinkBtn.style.display = 'none';
   }
 }
 

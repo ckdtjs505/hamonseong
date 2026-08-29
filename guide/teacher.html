@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>교사용 가이드 - 청소년부 성경 읽기</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/guide.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-topbar" style="padding: 1rem;">
+        <button class="back-btn" onclick="window.history.back()">← 뒤로 가기</button>
+      </div>
+    </header>
+
+    <main class="guide-container">
+      <header class="guide-header">
+        <h1>👨‍🏫 교사용 (리더/어드민) 가이드</h1>
+        <p>청소년부 반 관리 및 학생 현황 모니터링 방법</p>
+      </header>
+
+      <section class="guide-section">
+        <h2>1. 어드민 페이지 접속</h2>
+        <p>선생님(리더) 권한을 가진 계정으로 로그인해야 관리자 기능에 접근할 수 있습니다.</p>
+        <ul>
+          <li>일반 로그인 후 화면 우측 상단의 <strong>어드민</strong> 노란색 버튼을 클릭합니다.</li>
+          <li>(만약 어드민 버튼이 보이지 않는다면, 총괄 관리자에게 권한 부여를 요청해주세요.)</li>
+        </ul>
+      </section>
+
+      <section class="guide-section">
+        <h2>2. 대시보드 및 읽기 진도 확인</h2>
+        <p>반 학생들의 성경 읽기 진도와 기도 작성 현황을 한눈에 파악할 수 있습니다.</p>
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="images/dashboard.png" alt="대시보드 화면 스크린샷"
+            style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        </div>
+        <ul>
+          <li><strong>진도율 (퍼센트 바):</strong> 학생들이 전체 목표 대비 얼마나 읽었는지 표시됩니다.</li>
+          <li><strong>최근 읽은 말씀:</strong> 가장 최근에 어느 본문을 완료했는지 확인합니다.</li>
+          <li><strong>오늘의 함온성:</strong> 오늘 함온성(기도문)을 작성했는지 여부를 체크(O/X)로 보여줍니다.</li>
+        </ul>
+      </section>
+
+      <section class="guide-section">
+        <h2>3. 학생 및 반(Class) 관리</h2>
+        <p>리더는 자신의 반에 속한 학생들만 보거나, 전체 학생을 관리할 수 있습니다 (권한에 따라 다름).</p>
+        <ul>
+          <li>상단의 <strong>반(Class) 필터링</strong> 드롭다운을 통해 특정 반 학생들만 모아볼 수 있습니다.</li>
+          <li>어드민 권한이 있는 경우 학생들의 역할을 '학생(student)', '리더(leader)', '어드민(admin)'으로 변경할 수 있습니다.</li>
+          <li>새로운 학생을 등록하거나 정보를 수정하는 작업도 가능합니다.</li>
+        </ul>
+      </section>
+
+      <section class="guide-section">
+        <h2>4. 함온성 (기도문) 관리</h2>
+        <p>학생들이 올린 기도문을 모니터링하고 피드백을 줄 수 있습니다.</p>
+        <ul>
+          <li>어드민 대시보드의 '함온성 관리' 메뉴로 이동합니다.</li>
+          <li>날짜별로 학생들이 작성한 기도문을 모두 조회할 수 있습니다.</li>
+          <li>부적절한 내용이 포함되어 있거나 관리가 필요한 경우, 게시글을 숨기거나 삭제할 수 있는 기능이 제공됩니다.</li>
+        </ul>
+      </section>
+
+      <footer class="guide-footer">
+        <p>시스템 오류가 발생하거나 추가 기능 건의가 있다면 관리자에게 문의해 주세요.</p>
+      </footer>
+    </main>
+  </div>
+  <script>
+    const savedTheme = localStorage.getItem('bible_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+/* css/guide.css */
+.guide-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--surface-color, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .guide-container {
+  background-color: var(--surface-color, #1f2937);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+.guide-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color, #e5e7eb);
+}
+
+.guide-header h1 {
+  font-size: 2rem;
+  color: var(--text-color, #111827);
+  margin-bottom: 0.5rem;
+}
+
+.guide-header p {
+  color: var(--text-muted, #6b7280);
+}
+
+.guide-section {
+  margin-bottom: 2.5rem;
+}
+
+.guide-section h2 {
+  font-size: 1.5rem;
+  color: var(--primary-color, #3b82f6);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.guide-section h3 {
+  font-size: 1.25rem;
+  color: var(--text-color, #374151);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.guide-section p {
+  line-height: 1.6;
+  color: var(--text-color, #374151);
+  margin-bottom: 1rem;
+}
+
+.guide-section ul, .guide-section ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-color, #374151);
+}
+
+.guide-section li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.guide-image-placeholder {
+  width: 100%;
+  height: 200px;
+  background-color: var(--bg-color, #f3f4f6);
+  border: 2px dashed var(--border-color, #d1d5db);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #9ca3af);
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color, #3b82f6);
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background-color: var(--primary-hover, #2563eb);
+}
+
+.guide-footer {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-muted, #6b7280);
+}

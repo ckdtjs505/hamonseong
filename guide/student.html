@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학생용 가이드 - 청소년부 성경 읽기</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/guide.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-topbar" style="padding: 1rem;">
+        <button class="back-btn" onclick="window.history.back()">← 뒤로 가기</button>
+      </div>
+    </header>
+
+    <main class="guide-container">
+      <header class="guide-header">
+        <h1>📖 학생용 이용 가이드</h1>
+        <p>청소년부 성경 읽기 앱을 100% 활용하는 방법</p>
+      </header>
+
+      <section class="guide-section">
+        <h2>1. 시작하기 (로그인)</h2>
+        <p>매일 말씀을 읽기 위해서는 먼저 이름과 비밀번호(초기 설정됨)를 입력하여 로그인해야 합니다.</p>
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="images/login.png" alt="로그인 화면 스크린샷"
+            style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        </div>
+        <ul>
+          <li>우측 상단의 <strong>로그인</strong> 버튼을 누릅니다.</li>
+          <li>이름과 비밀번호를 입력합니다. (비밀번호를 모르는 경우 선생님께 문의해주세요.)</li>
+        </ul>
+      </section>
+
+      <section class="guide-section">
+        <h2>2. 오늘의 말씀 읽기</h2>
+        <p>로그인 후, 오늘 날짜에 해당하는 성경 본문이 화면에 나타납니다.</p>
+        <ul>
+          <li>본문을 천천히 읽어 내려갑니다.</li>
+          <li><strong>성경 버전 변경:</strong> 우측 상단 '버전 선택' 메뉴에서 <mark>우리말성경</mark>, <mark>개역개정</mark>, <mark>새한글</mark> 중
+            원하는 버전을 선택할 수 있습니다.</li>
+          <li>다 읽은 후에는 가장 아래의 <strong>말씀 읽기 완료</strong> 버튼을 눌러주세요.</li>
+        </ul>
+      </section>
+
+      <section class="guide-section">
+        <h2>3. 함께하는 온전한 성경읽기 (함온성)</h2>
+        <p>함온성은 말씀을 읽고 묵상하거나 기도문을 작성하는 공간입니다.</p>
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="images/hamonseong.png" alt="함온성"
+            style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        </div>
+        <ul>
+          <li>말씀 하단에 위치한 '함온성 (오늘의 기도)' 영역을 확인합니다.</li>
+          <li>오늘 말씀에서 느낀 점, 다짐, 혹은 기도제목을 적고 <strong>기도 올리기</strong>를 누릅니다.</li>
+          <li>작성한 기도는 다른 친구들과 함께 나눌 수 있습니다 (상단 <strong>함온성 현황 📊</strong> 클릭).</li>
+        </ul>
+      </section>
+
+      <section class="guide-section">
+        <h2>4. 보기 설정 (테마 및 글자 크기)</h2>
+        <p>눈이 편안하도록 화면을 설정할 수 있습니다.</p>
+        <ul>
+          <li><strong>글자 크기:</strong> 우측 상단의 <code>A-</code> / <code>A+</code> 버튼을 눌러 글자 크기를 조절합니다.</li>
+          <li><strong>테마 변경:</strong> ☀️ 라이트 모드, 🌙 다크 모드, 📜 페이퍼 모드 중에서 눈에 가장 편한 모드를 선택하세요.</li>
+        </ul>
+      </section>
+
+      <footer class="guide-footer">
+        <p>궁금한 점이 있다면 언제든 담당 선생님이나 강도사님께 물어보세요! 😊</p>
+      </footer>
+    </main>
+  </div>
+  <script>
+    // 테마 설정을 위해 로컬 스토리지 확인
+    const savedTheme = localStorage.getItem('bible_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</body>
+
+</html>
