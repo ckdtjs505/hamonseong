@@ -101,6 +101,7 @@ function initApp() {
   // 각 모듈 이벤트 설정 & 세션 확인
   setupAuthEvents();
   setupHamonseongEvents();
+  setupTTSEvents();
   checkSession();
 
   // 초기 날짜 뷰 렌더링
@@ -128,6 +129,8 @@ async function loadBibleReading(dateStr) {
   selectedVersesMap.clear();
   updateSelectedVersesBar();
   hideCompletionBanner();
+  // 날짜 변경 시 재생 중인 TTS 자동 정지
+  if (typeof closeTTSPlayer === 'function') closeTTSPlayer();
   renderLoadingState();
 
   try {

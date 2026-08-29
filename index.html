@@ -110,6 +110,10 @@
     <section id="planSummaryCard" class="plan-summary-card" style="display: none;">
       <div class="plan-summary-header">
         <span class="plan-badge">오늘의 말씀 범위</span>
+        <button id="ttsStartBtn" class="btn-tts-start" title="말씀 전체 듣기" onclick="startFullTTS()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          전체 듣기
+        </button>
       </div>
       <div id="planTitle" class="plan-title"></div>
       <div id="planRangeList" class="plan-range-list"></div>
@@ -140,6 +144,49 @@
       <p>© 2026 청소년부 성경 읽기 (Youth Bible Reading) | All rights reserved.</p>
     </footer>
 
+  </div>
+
+  <!-- TTS Player Bar (화면 하단 고정) -->
+  <div id="ttsPlayer">
+    <!-- 프로그레스 바 -->
+    <div id="ttsProgressTrack" title="클릭하여 해당 위치로 이동">
+      <div id="ttsProgressFill"></div>
+    </div>
+
+    <!-- 컨트롤 영역 -->
+    <div class="tts-player-inner">
+      <!-- 현재 읽는 구절 정보 -->
+      <div class="tts-info">
+        <span id="ttsCurrentRef">말씀 읽기 준비 중...</span>
+        <span id="ttsCounter">0 / 0</span>
+      </div>
+
+      <!-- 속도 선택 -->
+      <select id="ttsRateSelect" aria-label="읽기 속도 선택" title="읽기 속도">
+        <option value="0.7">0.7×</option>
+        <option value="0.85">0.85×</option>
+        <option value="1.0" selected>1×</option>
+        <option value="1.2">1.2×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2.0">2×</option>
+      </select>
+
+      <!-- 재생 컨트롤 -->
+      <div class="tts-controls">
+        <!-- 정지 버튼 -->
+        <button id="ttsStopBtn" aria-label="정지" title="정지">
+          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+        </button>
+
+        <!-- 재생 / 일시정지 버튼 -->
+        <button id="ttsPlayPauseBtn" aria-label="재생">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        </button>
+
+        <!-- 닫기 버튼 -->
+        <button id="ttsCloseBtn" aria-label="플레이어 닫기" title="닫기">✕</button>
+      </div>
+    </div>
   </div>
 
   <!-- 8. Auth Modal (Login / Register) -->
@@ -320,6 +367,7 @@
   <script src="js/client/ui/swipe-dismiss.js"></script> <!-- 바텀시트 스와이프 닫기 -->
   <!-- features: 기능별 모듈 -->
   <script src="js/client/features/auth.js"></script>
+  <script src="js/client/features/tts.js"></script>
   <script src="js/client/features/hamonseong.js"></script>
   <script src="js/client/features/prayer.js"></script>
   <script src="js/client/features/community.js"></script>
