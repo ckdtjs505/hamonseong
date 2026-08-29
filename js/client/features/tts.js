@@ -1,27 +1,41 @@
 /**
- * tts.js
- * TTS (Text-to-Speech) 기능
- * - 말씀 전체 순차 읽기
- * - 재생 / 일시정지 / 정지
- * - 속도 조절, 프로그레스 바, 현재 구절 강조
+ * tts.js — 말씀 TTS 플레이어
  *
- * 핵심 버그 수정:
- * 1. Chrome: cancel() 직후 speak()가 묵음 → 100ms setTimeout 딜레이
- * 2. Chrome: 15초 후 자동 멈춤 → keepAlive 타이머 (10초마다 pause/resume)
- * 3. cancel() 시 onend 이중 발화 → generation 카운터로 차단
- * 4. 음성 목록 비동기 로드 → waitForVoices() Promise
+ * 핵심 설계 원칙:
+ *   speak() 는 반드시 동기적 · 유저 제스처 콘텍스트 안에서 호출해야 한다.
+ *   → async/await 금지, setTimeout 으로만 비동기 처리
+ *
+ * 수정된 버그:
+ *   1. macOS/iOS : async/await 로 유저 제스처 콘텍스트 소실 → 완전 동기화
+ *   2. Android   : onend 콜백에서 speak() 직접 호출 실패 → setTimeout(fn, 50)
+ *   3. Chrome    : 15초 자동 중단 → keepAlive (10초 pause/resume)
+ *   4. 전환 버그  : cancel() 직후 speak() 묵음 → setTimeout(fn, 200)
+ *   5. onend 이중 발화 → generation 카운터
  */
 
 // ── 상태 ──────────────────────────────────────────────────────
 const ttsState = {
-  verseList:      [],    // { ref, text, el }
-  currentIndex:   0,
-  isPlaying:      false,
-  isPaused:       false,
-  rate:           1.0,
-  generation:     0,     // cancel() 후 구 onend 차단
-  keepAliveId:    null,  // Chrome 15초 버그 방지 타이머
+  verseList:    [],
+  currentIndex: 0,
+  isPlaying:    false,
+  isPaused:     false,
+  rate:         1.0,
+  generation:   0,
+  keepAliveId:  null,
 };
+
+// ── 한국어 음성 캐시 ─────────────────────────────────────────
+let _cachedKoVoice = null;
+
+function _cacheVoices() {
+  const all = window.speechSynthesis.getVoices();
+  if (all.length) {
+    _cachedKoVoice =
+      all.find(v => v.lang === 'ko-KR') ||
+      all.find(v => v.lang.startsWith('ko')) ||
+      null;
+  }
+}
 
 // ── 초기화 ───────────────────────────────────────────────────
 function setupTTSEvents() {
@@ -31,59 +45,43 @@ function setupTTSEvents() {
   const rate  = document.getElementById('ttsRateSelect');
   const track = document.getElementById('ttsProgressTrack');
 
-  if (pp)    pp.addEventListener('click', ttsTogglePlayPause);
+  if (pp)    pp.addEventListener('click',   ttsTogglePlayPause);
   if (stop)  stop.addEventListener('click', () => ttsStop(true));
   if (close) close.addEventListener('click', ttsClose);
-  if (rate)  rate.addEventListener('change', (e) => {
-    ttsState.rate = parseFloat(e.target.value);
-    if (ttsState.isPlaying) {
-      const idx = ttsState.currentIndex;
-      ttsCancel();
-      ttsSpeak(idx);
-    }
-  });
-  if (track) track.addEventListener('click', (e) => {
-    if (!ttsState.verseList.length) return;
-    const r = track.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-    const idx = Math.floor(ratio * ttsState.verseList.length);
-    ttsCancel();
-    ttsSpeak(idx);
-  });
 
-  // 음성 목록 미리 캐시
+  if (rate) {
+    rate.addEventListener('change', (e) => {
+      ttsState.rate = parseFloat(e.target.value);
+      if (ttsState.isPlaying) {
+        const idx = ttsState.currentIndex;
+        _ttsCancel();
+        // 사용자 제스처 콘텍스트에서 호출됐으므로 짧은 delay 후 재개
+        setTimeout(() => _ttsSpeak(idx), 200);
+      }
+    });
+  }
+
+  if (track) {
+    track.addEventListener('click', (e) => {
+      if (!ttsState.verseList.length) return;
+      const r     = track.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+      const idx   = Math.floor(ratio * ttsState.verseList.length);
+      _ttsCancel();
+      setTimeout(() => _ttsSpeak(idx), 200);
+    });
+  }
+
+  // 음성 목록 미리 캐시 (비동기 로드 대응)
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.getVoices();
-    if (typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
-      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-    }
+    _cacheVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', _cacheVoices);
   }
 }
 
-// ── 음성 목록 로드 대기 ───────────────────────────────────────
-function waitForVoices(timeoutMs = 2000) {
-  return new Promise((resolve) => {
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) { resolve(voices); return; }
-    const timer = setTimeout(() => resolve([]), timeoutMs);
-    window.speechSynthesis.addEventListener('voiceschanged', function handler() {
-      clearTimeout(timer);
-      window.speechSynthesis.removeEventListener('voiceschanged', handler);
-      resolve(window.speechSynthesis.getVoices());
-    });
-  });
-}
-
-// ── 한국어 음성 선택 ─────────────────────────────────────────
-function getKoVoice(voices) {
-  return voices.find(v => v.lang === 'ko-KR')
-      || voices.find(v => v.lang.startsWith('ko'))
-      || null;
-}
-
 // ── Chrome 15초 버그 방지 ────────────────────────────────────
-function keepAliveStart() {
-  keepAliveStop();
+function _keepAliveStart() {
+  _keepAliveStop();
   ttsState.keepAliveId = setInterval(() => {
     if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
       window.speechSynthesis.pause();
@@ -91,7 +89,7 @@ function keepAliveStart() {
     }
   }, 10000);
 }
-function keepAliveStop() {
+function _keepAliveStop() {
   if (ttsState.keepAliveId) {
     clearInterval(ttsState.keepAliveId);
     ttsState.keepAliveId = null;
@@ -99,14 +97,15 @@ function keepAliveStop() {
 }
 
 // ── generation 기반 cancel ───────────────────────────────────
-function ttsCancel() {
+function _ttsCancel() {
   ttsState.generation++;
   window.speechSynthesis.cancel();
-  keepAliveStop();
+  _keepAliveStop();
 }
 
 // ── 공개 API: 전체 듣기 시작 ─────────────────────────────────
-async function startFullTTS() {
+// ★ 이 함수는 반드시 동기적으로 호출돼야 한다 (onClick 직결)
+function startFullTTS() {
   if (!('speechSynthesis' in window)) {
     showToast('⚠️ 이 브라우저는 TTS를 지원하지 않습니다.');
     return;
@@ -121,10 +120,8 @@ async function startFullTTS() {
   // 구절 목록 구성
   ttsState.verseList = [];
   items.forEach(el => {
-    const numEl  = el.querySelector('.verse-num');
-    const txtEl  = el.querySelector('.verse-text');
-    const ref    = numEl  ? numEl.textContent.trim()  : '';
-    const text   = txtEl  ? txtEl.textContent.trim()  : '';
+    const ref  = el.querySelector('.verse-num')?.textContent.trim()  || '';
+    const text = el.querySelector('.verse-text')?.textContent.trim() || '';
     if (text) ttsState.verseList.push({ ref, text, el });
   });
 
@@ -134,67 +131,70 @@ async function startFullTTS() {
   }
 
   // 기존 재생 취소
-  ttsCancel();
-  ttsState.isPlaying = false;
-  ttsState.isPaused  = false;
+  _ttsCancel();
+  ttsState.isPlaying    = false;
+  ttsState.isPaused     = false;
+  ttsState.currentIndex = 0;
 
-  ttsShowPlayer();
-  ttsUpdateProgress(0);
-  ttsUpdateIcon(false);
+  _ttsShowPlayer();
+  _ttsUpdateProgress(0);
+  _ttsUpdateIcon(false);
   showToast('🔊 말씀 읽기를 시작합니다...');
 
-  // ★ 핵심: cancel() 완료 대기 후 speak
-  await new Promise(r => setTimeout(r, 150));
-  ttsSpeak(0);
+  // ★ cancel() 완료 대기 후 재생 시작
+  //   async/await 대신 setTimeout 사용 (유저 제스처 콘텍스트 유지)
+  setTimeout(() => _ttsSpeak(0), 200);
 }
 
-// ── 순차 재생 엔진 ───────────────────────────────────────────
-async function ttsSpeak(index) {
+// ── 재생 엔진 (완전 동기) ────────────────────────────────────
+function _ttsSpeak(index) {
   if (index >= ttsState.verseList.length) {
-    ttsDone();
+    _ttsDone();
     return;
   }
+  if (ttsState.isPaused) return;
 
   ttsState.currentIndex = index;
   ttsState.isPlaying    = true;
-  ttsState.isPaused     = false;
 
   const myGen = ttsState.generation;
   const item  = ttsState.verseList[index];
 
-  // 음성 준비
-  const voices    = await waitForVoices(1500);
-  const koVoice   = getKoVoice(voices);
+  // 음성 목록 재캐시 (처음 실행 시 아직 로드 중일 수 있음)
+  _cacheVoices();
+
   const utterance = new SpeechSynthesisUtterance(item.text);
   utterance.lang  = 'ko-KR';
   utterance.rate  = ttsState.rate;
-  if (koVoice) utterance.voice = koVoice;
-
-  // generation 바뀌었으면 (cancel 됐으면) 중단
-  if (ttsState.generation !== myGen) return;
+  if (_cachedKoVoice) utterance.voice = _cachedKoVoice;
 
   utterance.onstart = () => {
     if (ttsState.generation !== myGen) return;
-    ttsHighlight(index);
-    ttsUpdateProgress(index);
-    ttsUpdateIcon(true);
+    _ttsHighlight(index);
+    _ttsUpdateProgress(index);
+    _ttsUpdateIcon(true);
   };
 
   utterance.onend = () => {
-    if (ttsState.generation !== myGen) return; // cancel 후 발화 무시
+    if (ttsState.generation !== myGen) return; // cancel 후 무시
     if (ttsState.isPaused) return;
-    ttsSpeak(index + 1);
+    // ★ Android: onend 콜백 안에서 speak() 직접 호출 실패
+    //   → setTimeout(fn, 50) 으로 이벤트 루프 한 번 비운 뒤 호출
+    setTimeout(() => {
+      if (ttsState.generation !== myGen) return;
+      if (ttsState.isPaused) return;
+      _ttsSpeak(index + 1);
+    }, 50);
   };
 
   utterance.onerror = (e) => {
     if (ttsState.generation !== myGen) return;
     if (e.error === 'interrupted' || e.error === 'canceled') return;
     console.warn('[TTS] error:', e.error);
-    showToast('⚠️ TTS 오류: ' + e.error);
   };
 
   window.speechSynthesis.speak(utterance);
-  keepAliveStart();
+  _keepAliveStart();
 }
 
 // ── 재생 / 일시정지 토글 ─────────────────────────────────────
@@ -207,62 +207,55 @@ function ttsTogglePlayPause() {
     window.speechSynthesis.resume();
     ttsState.isPaused  = false;
     ttsState.isPlaying = true;
-    ttsUpdateIcon(true);
-    keepAliveStart();
+    _ttsUpdateIcon(true);
+    _keepAliveStart();
   } else {
     window.speechSynthesis.pause();
     ttsState.isPaused  = true;
     ttsState.isPlaying = false;
-    ttsUpdateIcon(false);
-    keepAliveStop();
+    _ttsUpdateIcon(false);
+    _keepAliveStop();
   }
 }
 
 // ── 정지 ─────────────────────────────────────────────────────
-function ttsStop(resetUI = true) {
-  ttsCancel();
+function ttsStop(resetUI) {
+  _ttsCancel();
   ttsState.isPlaying    = false;
   ttsState.isPaused     = false;
   ttsState.currentIndex = 0;
-  ttsClearHighlight();
-  if (resetUI) {
-    ttsUpdateIcon(false);
-    ttsUpdateProgress(0);
+  _ttsClearHighlight();
+  if (resetUI !== false) {
+    _ttsUpdateIcon(false);
+    _ttsUpdateProgress(0);
   }
 }
 
 // ── 완료 ─────────────────────────────────────────────────────
-function ttsDone() {
-  keepAliveStop();
+function _ttsDone() {
+  _keepAliveStop();
   ttsState.isPlaying    = false;
   ttsState.isPaused     = false;
   ttsState.currentIndex = 0;
-  ttsClearHighlight();
-  ttsUpdateIcon(false);
-  ttsUpdateProgress(ttsState.verseList.length);
+  _ttsClearHighlight();
+  _ttsUpdateIcon(false);
+  _ttsUpdateProgress(ttsState.verseList.length);
   showToast('📖 말씀 읽기를 모두 마쳤습니다!');
 }
 
-// ── 플레이어 UI ───────────────────────────────────────────────
-function ttsShowPlayer() {
+// ── 플레이어 표시/숨기기 ────────────────────────────────────
+function _ttsShowPlayer() {
   const p = document.getElementById('ttsPlayer');
-  if (p) {
-    p.classList.add('visible');
-    document.body.classList.add('tts-active');
-  }
+  if (p) { p.classList.add('visible'); document.body.classList.add('tts-active'); }
 }
-
 function ttsClose() {
   ttsStop(true);
   const p = document.getElementById('ttsPlayer');
-  if (p) {
-    p.classList.remove('visible');
-    document.body.classList.remove('tts-active');
-  }
+  if (p) { p.classList.remove('visible'); document.body.classList.remove('tts-active'); }
 }
 
 // ── 아이콘 갱신 ──────────────────────────────────────────────
-function ttsUpdateIcon(playing) {
+function _ttsUpdateIcon(playing) {
   const btn = document.getElementById('ttsPlayPauseBtn');
   if (!btn) return;
   btn.innerHTML = playing
@@ -273,11 +266,11 @@ function ttsUpdateIcon(playing) {
 }
 
 // ── 프로그레스 갱신 ──────────────────────────────────────────
-function ttsUpdateProgress(index) {
+function _ttsUpdateProgress(index) {
   const total = ttsState.verseList.length;
-  const fill    = document.getElementById('ttsProgressFill');
-  const refEl   = document.getElementById('ttsCurrentRef');
-  const cntEl   = document.getElementById('ttsCounter');
+  const fill  = document.getElementById('ttsProgressFill');
+  const refEl = document.getElementById('ttsCurrentRef');
+  const cntEl = document.getElementById('ttsCounter');
 
   const pct = total > 0 ? Math.min(100, (index / total) * 100) : 0;
   if (fill)  fill.style.width  = `${pct}%`;
@@ -288,20 +281,18 @@ function ttsUpdateProgress(index) {
 }
 
 // ── 하이라이트 ───────────────────────────────────────────────
-function ttsHighlight(index) {
-  ttsClearHighlight();
+function _ttsHighlight(index) {
+  _ttsClearHighlight();
   const item = ttsState.verseList[index];
   if (item && item.el) {
     item.el.classList.add('tts-reading');
     item.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
-function ttsClearHighlight() {
-  document.querySelectorAll('.verse-item.tts-reading').forEach(el => {
-    el.classList.remove('tts-reading');
-  });
+function _ttsClearHighlight() {
+  document.querySelectorAll('.verse-item.tts-reading')
+    .forEach(el => el.classList.remove('tts-reading'));
 }
 
-// ── 하위 호환 (app.js에서 closeTTSPlayer 호출) ────────────────
+// ── 하위 호환 ────────────────────────────────────────────────
 function closeTTSPlayer() { ttsClose(); }
-function stopTTS(ui)       { ttsStop(ui); }
