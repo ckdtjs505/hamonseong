@@ -37,4 +37,6 @@ const BIBLE_BOOK_IDS = {
   유다서: 65, 요한계시록: 66
 };
 
-const API_BASE_URL = 'https://hamonseong.com/';
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'https://hamonseong.com/'
+  : '/';

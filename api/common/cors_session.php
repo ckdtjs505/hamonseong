@@ -20,7 +20,10 @@ foreach ($allowedOrigins as $allowed) {
     }
 }
 
-if ($isLocalhost || $origin === 'https://ckdtjst505.mycafe24.com' || $origin === 'http://ckdtjst505.mycafe24.com') {
+if ($isLocalhost || 
+    $origin === 'https://ckdtjst505.mycafe24.com' || 
+    $origin === 'http://ckdtjst505.mycafe24.com' ||
+    strpos($origin, 'hamonseong.com') !== false) {
     header("Access-Control-Allow-Origin: " . $origin);
     header("Access-Control-Allow-Credentials: true");
 } else {
