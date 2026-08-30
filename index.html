@@ -7,6 +7,47 @@
   <title>청소년부 성경 읽기 - 매일 말씀 묵상</title>
   <meta name="description" content="청소년부 성경 읽기표 및 매일 말씀 묵상 웹 애플리케이션입니다.">
 
+  <!-- Global Error Handler for Mobile WebView Debugging -->
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      showGlobalError('JS Error: ' + message + ' at ' + (source ? source.split('/').pop() : 'unknown') + ':' + lineno);
+      return false;
+    };
+    window.addEventListener('unhandledrejection', function(event) {
+      showGlobalError('Promise Error: ' + (event.reason ? event.reason.message || event.reason : 'Unknown'));
+    });
+    function showGlobalError(msg) {
+      var isAdmin = false;
+      try {
+        if (window.currentUser && (window.currentUser.role === 'admin' || window.currentUser.role === 'leader')) isAdmin = true;
+        else if (localStorage.getItem('cached_role') === 'admin' || localStorage.getItem('cached_role') === 'leader') isAdmin = true;
+      } catch (e) {}
+      
+      if (!isAdmin) return;
+
+      var errDiv = document.createElement('div');
+      errDiv.style.position = 'fixed';
+      errDiv.style.top = '0';
+      errDiv.style.left = '0';
+      errDiv.style.width = '100%';
+      errDiv.style.backgroundColor = 'rgba(255, 0, 0, 0.9)';
+      errDiv.style.color = 'white';
+      errDiv.style.padding = '10px';
+      errDiv.style.zIndex = '999999';
+      errDiv.style.fontSize = '12px';
+      errDiv.style.wordBreak = 'break-all';
+      errDiv.style.boxSizing = 'border-box';
+      errDiv.innerHTML = '<strong>[Error]</strong> ' + msg + ' <button onclick="this.parentElement.remove()" style="margin-left:10px; color:black; padding:2px 5px; border-radius:3px; cursor:pointer;">닫기</button>';
+      if (document.body) {
+        document.body.appendChild(errDiv);
+      } else {
+        window.addEventListener('DOMContentLoaded', function() {
+          document.body.appendChild(errDiv);
+        });
+      }
+    }
+  </script>
+
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>

@@ -15,19 +15,20 @@
 
 // ── 상태 ──────────────────────────────────────────────────────
 const ttsState = {
-  verseList:    [],
+  verseList: [],
   currentIndex: 0,
-  isPlaying:    false,
-  isPaused:     false,
-  rate:         1.0,
-  generation:   0,
-  keepAliveId:  null,
+  isPlaying: false,
+  isPaused: false,
+  rate: 1.0,
+  generation: 0,
+  keepAliveId: null,
 };
 
 // ── 한국어 음성 캐시 ─────────────────────────────────────────
 let _cachedKoVoice = null;
 
 function _cacheVoices() {
+  if (!window.speechSynthesis) return;
   const all = window.speechSynthesis.getVoices();
   if (all.length) {
     _cachedKoVoice =
@@ -39,14 +40,14 @@ function _cacheVoices() {
 
 // ── 초기화 ───────────────────────────────────────────────────
 function setupTTSEvents() {
-  const pp    = document.getElementById('ttsPlayPauseBtn');
-  const stop  = document.getElementById('ttsStopBtn');
+  const pp = document.getElementById('ttsPlayPauseBtn');
+  const stop = document.getElementById('ttsStopBtn');
   const close = document.getElementById('ttsCloseBtn');
-  const rate  = document.getElementById('ttsRateSelect');
+  const rate = document.getElementById('ttsRateSelect');
   const track = document.getElementById('ttsProgressTrack');
 
-  if (pp)    pp.addEventListener('click',   ttsTogglePlayPause);
-  if (stop)  stop.addEventListener('click', () => ttsStop(true));
+  if (pp) pp.addEventListener('click', ttsTogglePlayPause);
+  if (stop) stop.addEventListener('click', () => ttsStop(true));
   if (close) close.addEventListener('click', ttsClose);
 
   if (rate) {
@@ -63,9 +64,9 @@ function setupTTSEvents() {
   if (track) {
     track.addEventListener('click', (e) => {
       if (!ttsState.verseList.length) return;
-      const r     = track.getBoundingClientRect();
+      const r = track.getBoundingClientRect();
       const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-      const idx   = Math.floor(ratio * ttsState.verseList.length);
+      const idx = Math.floor(ratio * ttsState.verseList.length);
       _ttsCancel();
       _ttsSpeak(idx);
     });
@@ -82,7 +83,7 @@ function setupTTSEvents() {
 function _keepAliveStart() {
   _keepAliveStop();
   ttsState.keepAliveId = setInterval(() => {
-    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+    if (window.speechSynthesis && window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
       window.speechSynthesis.pause();
       window.speechSynthesis.resume();
     }
@@ -98,7 +99,9 @@ function _keepAliveStop() {
 // ── generation 기반 cancel ───────────────────────────────────
 function _ttsCancel() {
   ttsState.generation++;
-  window.speechSynthesis.cancel();
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
   _keepAliveStop();
 }
 
@@ -119,8 +122,11 @@ function startFullTTS() {
   // 구절 목록 구성
   ttsState.verseList = [];
   items.forEach(el => {
-    const ref  = el.querySelector('.verse-num')?.textContent.trim()  || '';
-    const text = el.querySelector('.verse-text')?.textContent.trim() || '';
+    const refEl = el.querySelector('.verse-num');
+    const ref = refEl ? refEl.textContent.trim() : '';
+
+    const textEl = el.querySelector('.verse-text');
+    const text = textEl ? textEl.textContent.trim() : '';
     if (text) ttsState.verseList.push({ ref, text, el });
   });
 
@@ -131,8 +137,8 @@ function startFullTTS() {
 
   // 기존 재생 취소
   _ttsCancel();
-  ttsState.isPlaying    = false;
-  ttsState.isPaused     = false;
+  ttsState.isPlaying = false;
+  ttsState.isPaused = false;
   ttsState.currentIndex = 0;
 
   _ttsShowPlayer();
@@ -147,6 +153,7 @@ function startFullTTS() {
 
 // ── 재생 엔진 (완전 동기) ────────────────────────────────────
 function _ttsSpeak(index) {
+  if (!window.speechSynthesis) return;
   if (index >= ttsState.verseList.length) {
     _ttsDone();
     return;
@@ -154,17 +161,17 @@ function _ttsSpeak(index) {
   if (ttsState.isPaused) return;
 
   ttsState.currentIndex = index;
-  ttsState.isPlaying    = true;
+  ttsState.isPlaying = true;
 
   const myGen = ttsState.generation;
-  const item  = ttsState.verseList[index];
+  const item = ttsState.verseList[index];
 
   // 음성 목록 재캐시 (처음 실행 시 아직 로드 중일 수 있음)
   _cacheVoices();
 
   const utterance = new SpeechSynthesisUtterance(item.text);
-  utterance.lang  = 'ko-KR';
-  utterance.rate  = ttsState.rate;
+  utterance.lang = 'ko-KR';
+  utterance.rate = ttsState.rate;
   if (_cachedKoVoice) utterance.voice = _cachedKoVoice;
 
   utterance.onstart = () => {
@@ -211,7 +218,7 @@ function ttsTogglePlayPause() {
   }
   if (ttsState.isPaused) {
     // 안드로이드 기기 버그 대응: resume() 대신 중단된 구절부터 새롭게 _ttsSpeak 호출
-    ttsState.isPaused  = false;
+    ttsState.isPaused = false;
     ttsState.isPlaying = true;
     _ttsUpdateIcon(true);
     _keepAliveStart();
@@ -219,7 +226,7 @@ function ttsTogglePlayPause() {
   } else {
     // 안드로이드 기기 버그 대응: pause() 대신 cancel()을 사용하여 완전히 끊음
     _ttsCancel();
-    ttsState.isPaused  = true;
+    ttsState.isPaused = true;
     ttsState.isPlaying = false;
     _ttsUpdateIcon(false);
     _keepAliveStop();
@@ -229,8 +236,8 @@ function ttsTogglePlayPause() {
 // ── 정지 ─────────────────────────────────────────────────────
 function ttsStop(resetUI) {
   _ttsCancel();
-  ttsState.isPlaying    = false;
-  ttsState.isPaused     = false;
+  ttsState.isPlaying = false;
+  ttsState.isPaused = false;
   ttsState.currentIndex = 0;
   _ttsClearHighlight();
   if (resetUI !== false) {
@@ -242,8 +249,8 @@ function ttsStop(resetUI) {
 // ── 완료 ─────────────────────────────────────────────────────
 function _ttsDone() {
   _keepAliveStop();
-  ttsState.isPlaying    = false;
-  ttsState.isPaused     = false;
+  ttsState.isPlaying = false;
+  ttsState.isPaused = false;
   ttsState.currentIndex = 0;
   _ttsClearHighlight();
   _ttsUpdateIcon(false);
@@ -276,12 +283,12 @@ function _ttsUpdateIcon(playing) {
 // ── 프로그레스 갱신 ──────────────────────────────────────────
 function _ttsUpdateProgress(index) {
   const total = ttsState.verseList.length;
-  const fill  = document.getElementById('ttsProgressFill');
+  const fill = document.getElementById('ttsProgressFill');
   const refEl = document.getElementById('ttsCurrentRef');
   const cntEl = document.getElementById('ttsCounter');
 
   const pct = total > 0 ? Math.min(100, (index / total) * 100) : 0;
-  if (fill)  fill.style.width  = `${pct}%`;
+  if (fill) fill.style.width = `${pct}%`;
   if (cntEl) cntEl.textContent = total > 0 ? `${Math.min(index + 1, total)} / ${total}` : '0 / 0';
 
   const cur = ttsState.verseList[Math.min(index, total - 1)];
