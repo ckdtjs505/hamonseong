@@ -20,10 +20,7 @@ foreach ($allowedOrigins as $allowed) {
     }
 }
 
-if ($isLocalhost || 
-    $origin === 'https://ckdtjst505.mycafe24.com' || 
-    $origin === 'http://ckdtjst505.mycafe24.com' ||
-    strpos($origin, 'hamonseong.com') !== false) {
+if ($isLocalhost || $origin === 'https://ckdtjst505.mycafe24.com' || $origin === 'http://ckdtjst505.mycafe24.com') {
     header("Access-Control-Allow-Origin: " . $origin);
     header("Access-Control-Allow-Credentials: true");
 } else {
@@ -32,21 +29,47 @@ if ($isLocalhost ||
 }
 
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Session-Id");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// 크로스 도메인에서 쿠키 전송을 위해 SameSite=None, Secure 설정 필수
-session_set_cookie_params([
-    'lifetime' => 0,
+$isSecure = false;
+if (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on') {
+    $isSecure = true;
+} elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+    $isSecure = true;
+}
+
+$cookieParams = [
+    'lifetime' => 60 * 60 * 24 * 30, // 30 days (카카오 브라우저 등에서 세션 쿠키가 쉽게 날아가는 것을 방지)
     'path' => '/',
-    'secure' => true,       // 반드시 HTTPS 환경이어야 함 (또는 브라우저 정책상 localhost는 예외적으로 허용됨)
     'httponly' => true,
-    'samesite' => 'None'    // 크로스 도메인(Third-party) 쿠키 허용
-]);
+    'secure' => $isSecure
+];
+
+// SameSite=None은 localhost 개발 환경(크로스 도메인)에서만 필요함
+// 프로덕션(같은 도메인)에서는 SameSite=None을 쓰면 카카오톡 인앱 브라우저나 일부 iOS 기기에서 쿠키를 거부/삭제하는 버그가 있음
+if ($isLocalhost) {
+    $cookieParams['secure'] = true;
+    $cookieParams['samesite'] = 'None';
+} else {
+    $cookieParams['samesite'] = 'Lax';
+}
+
+// API 응답 캐싱 방지 (카카오 인앱 브라우저의 강력한 캐싱으로 인한 과거 상태 반환 방지)
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+session_set_cookie_params($cookieParams);
+
+// 카카오톡 브라우저의 쿠키 유실 버그를 완전히 우회하기 위해, 클라이언트에서 헤더로 세션 ID를 보내면 이를 강제로 적용합니다.
+if (isset($_SERVER['HTTP_X_SESSION_ID']) && !empty($_SERVER['HTTP_X_SESSION_ID'])) {
+    session_id($_SERVER['HTTP_X_SESSION_ID']);
+}
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

@@ -34,14 +34,26 @@ function renderLogs(logs) {
         const myMsg = log.myMessage ? log.myMessage.substring(0, 30) + (log.myMessage.length > 30 ? '...' : '') : '-';
         const pray = log.pray ? log.pray.substring(0, 30) + (log.pray.length > 30 ? '...' : '') : '-';
 
+        const fullMyMsg = escapeHtml(log.myMessage || '-');
+        const fullPray = escapeHtml(log.pray || '-');
+        
         tr.innerHTML = `
             <td>${log.id}</td>
             <td>${log.timestamp}</td>
             <td>${log.name} (${log.username || '알수없음'})</td>
             <td>${log.daycnt}</td>
             <td>
-                <div style="font-size: 0.8rem; margin-bottom: 4px;"><strong>말씀:</strong> ${myMsg}</div>
-                <div style="font-size: 0.8rem;"><strong>기도:</strong> ${pray}</div>
+                <div style="font-size: 0.8rem; margin-bottom: 4px; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">
+                    <strong>말씀:</strong> ${myMsg}
+                  </span>
+                </div>
+                <div style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">
+                    <strong>기도:</strong> ${pray}
+                  </span>
+                  <button class="admin-btn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; background: var(--bg-primary); border: 1px solid var(--border-color);" onclick="openLogDetailModal(\`${fullMyMsg}\`, \`${fullPray}\`)">자세히</button>
+                </div>
             </td>
             <td>${new Date(log.created_at).toLocaleString()}</td>
             <td>
@@ -70,13 +82,30 @@ window.deleteLog = async (logId) => {
         });
         const data = await res.json();
         
-        if (data.status === 'success') {
+        if (res.ok) {
             alert('삭제되었습니다.');
-            loadLogs(); // 목록 갱신
+            loadLogs();
         } else {
-            alert(data.message);
+            alert(data.message || '삭제에 실패했습니다.');
         }
-    } catch (err) {
-        console.error(err);
+    } catch (error) {
+        console.error('Delete log error', error);
+        alert('삭제 중 오류가 발생했습니다.');
     }
+};
+
+/**
+ * 로그 상세 모달 열기
+ */
+window.openLogDetailModal = function(myMsg, pray) {
+    document.getElementById('logDetailMsg').textContent = myMsg;
+    document.getElementById('logDetailPray').textContent = pray;
+    document.getElementById('logDetailModal').style.display = 'flex';
+};
+
+/**
+ * 로그 상세 모달 닫기
+ */
+window.closeLogDetailModal = function() {
+    document.getElementById('logDetailModal').style.display = 'none';
 };

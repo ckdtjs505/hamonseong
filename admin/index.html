@@ -22,8 +22,7 @@
       <button class="admin-nav-item" data-target="logs">함온성 기록 관리</button>
       <button class="admin-nav-item" data-target="plans">함온성 계획 관리</button>
       <div style="flex-grow: 1;"></div>
-      <button class="admin-nav-item" onclick="window.location.href='../guide/teacher.html'" style="background-color: #3b82f6; color: white;">👨‍🏫 교사용 가이드</button>
-      <button class="admin-nav-item" onclick="window.location.href='../index.html'" style="margin-top: 10px;">돌아가기</button>
+      <button class="admin-nav-item" onclick="window.location.href='../index.html'">돌아가기</button>
     </aside>
 
     <main class="admin-main">
@@ -186,11 +185,35 @@
       </form>
     </div>
   </div>
+
+  <!-- Log Detail Modal -->
+  <div id="logDetailModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;">
+    <div class="admin-card" style="width: 500px; max-width: 90%; max-height: 80vh; display: flex; flex-direction: column;">
+      <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">함온성 기록 상세</h3>
+      <div style="flex: 1; overflow-y: auto; margin-bottom: 1rem; padding-right: 0.5rem; line-height: 1.6;">
+        <div style="margin-bottom: 1rem;">
+          <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.25rem;">선택 구절 (말씀)</h4>
+          <p id="logDetailMsg" style="background: var(--bg-primary); padding: 1rem; border-radius: 8px; font-size: 0.95rem; white-space: pre-wrap; word-break: break-all;"></p>
+        </div>
+        <div>
+          <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.25rem;">기도 제목</h4>
+          <p id="logDetailPray" style="background: var(--bg-primary); padding: 1rem; border-radius: 8px; font-size: 0.95rem; white-space: pre-wrap; word-break: break-all;"></p>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="button" class="admin-btn" onclick="closeLogDetailModal()"
+          style="background-color: var(--bg-subtle);">닫기</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== JavaScript 로드 순서 ===== -->
   <!-- 1. constants.js: API_BASE_URL 등 전역 상수 정의 -->
   <!-- 2. 각 탭별 기능 스크립트 (users, progress, logs, plans) -->
   <!-- 3. main.js: 페이지 초기화 및 탭 전환 제어 (모든 기능 스크립트 로드 후 실행) -->
   <script src="../js/core/constants.js"></script>
+  <script src="../js/core/utils.js"></script>
   <script src="../js/admin/users.js"></script>
   <script src="../js/admin/progress.js"></script>
   <script src="../js/admin/logs.js"></script>

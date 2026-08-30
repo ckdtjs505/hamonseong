@@ -81,3 +81,31 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+/**
+ * 카카오톡 인앱 브라우저 등의 쿠키 유실 문제를 우회하기 위해
+ * 전역 fetch를 오버라이딩하여 localStorage에 있는 세션 토큰을 헤더에 자동 주입합니다.
+ */
+const originalFetch = window.fetch;
+window.fetch = async function(...args) {
+  let [resource, config] = args;
+  
+  // API 요청인 경우에만 토큰 주입
+  if (typeof resource === 'string' && resource.includes('api/')) {
+    config = config || {};
+    config.headers = config.headers || {};
+    
+    // 헤더가 Headers 객체일 경우와 일반 객체일 경우 처리
+    const token = localStorage.getItem('api_token');
+    if (token) {
+      if (config.headers instanceof Headers) {
+        config.headers.append('X-Session-Id', token);
+      } else {
+        config.headers['X-Session-Id'] = token;
+      }
+    }
+    args[1] = config;
+  }
+  
+  return originalFetch.apply(window, args);
+};

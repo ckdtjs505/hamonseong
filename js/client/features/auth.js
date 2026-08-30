@@ -13,7 +13,6 @@ async function checkSession() {
     const data = await res.json();
     if (data.status === 'success' && data.isLoggedIn) {
       currentUser = data.user;
-      try { localStorage.setItem('cached_role', currentUser.role); } catch(e){}
       updateAuthUI();
       checkAndRestoreSavedCompletion(getFormattedDate(currentDate));
     }
@@ -31,7 +30,6 @@ function updateAuthUI() {
     if (elements.userProfileArea) elements.userProfileArea.style.display = 'flex';
     if (elements.userNameSpan) elements.userNameSpan.textContent = `${currentUser.name} 님`;
     if (elements.myPrayersBtn) elements.myPrayersBtn.style.display = 'inline-flex';
-    
     if (elements.adminLinkBtn) {
       if (currentUser.role === 'admin' || currentUser.role === 'leader') {
         elements.adminLinkBtn.style.display = 'inline-block';
@@ -177,7 +175,7 @@ async function handleLogin(e) {
 
     if (data.status === 'success') {
       currentUser = data.user;
-      try { localStorage.setItem('cached_role', currentUser.role); } catch(e){}
+      if (data.token) localStorage.setItem('api_token', data.token);
       updateAuthUI();
       closeAuthModal();
       showToast(`반갑습니다, ${currentUser.name} 님!`);
@@ -220,7 +218,7 @@ async function handleRegister(e) {
 
     if (data.status === 'success') {
       currentUser = data.user;
-      try { localStorage.setItem('cached_role', currentUser.role); } catch(e){}
+      if (data.token) localStorage.setItem('api_token', data.token);
       updateAuthUI();
       closeAuthModal();
       showToast(`회원가입 완료! 환영합니다, ${currentUser.name} 님!`);
@@ -241,7 +239,7 @@ async function handleLogout() {
     const data = await res.json();
 
     currentUser = null;
-    try { localStorage.removeItem('cached_role'); } catch(e){}
+    localStorage.removeItem('api_token');
     updateAuthUI();
     hideCompletionBanner();
     selectedVersesMap.clear();
@@ -250,7 +248,7 @@ async function handleLogout() {
   } catch (err) {
     console.error('Logout error:', err);
     currentUser = null;
-    try { localStorage.removeItem('cached_role'); } catch(e){}
+    localStorage.removeItem('api_token');
     updateAuthUI();
   }
 }

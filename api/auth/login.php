@@ -60,7 +60,8 @@ try {
     echo json_encode([
         'status'  => 'success',
         'message' => '로그인에 성공하였습니다.',
-        'user'    => $userData
+        'user'    => $userData,
+        'token'   => session_id()
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
