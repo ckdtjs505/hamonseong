@@ -124,8 +124,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
 }
 
 .brand {
@@ -171,7 +169,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 0.75rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -609,23 +606,8 @@ body {
 
   .app-header {
     flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-  }
-
-  .header-topbar {
-    flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
-    width: 100%;
-  }
-
-  .user-auth-area, .user-profile-area {
-    width: 100%;
-  }
-
-  .user-profile-area {
-    justify-content: space-between;
   }
 
   .header-controls {
@@ -670,52 +652,14 @@ body {
   border: none;
 }
 
-/* Login Pill Button */
-.login-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.4rem 0.4rem 0.4rem 1.1rem;
-  border-radius: 30px;
-  background-color: var(--bg-subtle);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.login-pill-btn:hover {
-  background-color: var(--bg-card);
-  border-color: var(--accent-primary);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.login-prompt-text {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  pointer-events: none;
-}
-
-.login-action-text {
+.btn-login {
   background-color: var(--accent-primary);
   color: #ffffff;
-  padding: 0.45rem 1rem;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: background-color 0.2s ease;
-  pointer-events: none;
 }
 
-.login-pill-btn:hover .login-action-text {
+.btn-login:hover {
   background-color: var(--accent-hover);
-}
-
-.hide-on-mobile {
-  display: inline-block;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
 }
 
 .user-profile-area {

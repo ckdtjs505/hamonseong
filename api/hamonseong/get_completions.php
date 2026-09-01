@@ -48,12 +48,13 @@ try {
         $stmt = $pdo->prepare("
             SELECT * FROM `hamonseong_logs`
             WHERE `user_id` = :user_id
-              AND (`timestamp` = :tsFormatted OR `timestamp` = :rawDate)
+              AND (DATE(`created_at`) = :date OR `timestamp` = :tsFormatted OR `timestamp` = :rawDate)
             ORDER BY `id` DESC
             LIMIT 1
         ");
         $stmt->execute([
             'user_id'     => $userId,
+            'date'        => $rawDate,
             'tsFormatted' => $tsFormatted,
             'rawDate'     => $rawDate
         ]);

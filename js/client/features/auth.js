@@ -38,7 +38,7 @@ function updateAuthUI() {
       }
     }
   } else {
-    if (elements.loginOpenBtn) elements.loginOpenBtn.style.display = 'inline-flex';
+    if (elements.loginOpenBtn) elements.loginOpenBtn.style.display = 'inline-block';
     if (elements.userProfileArea) elements.userProfileArea.style.display = 'none';
     if (elements.userNameSpan) elements.userNameSpan.textContent = '';
     if (elements.myPrayersBtn) elements.myPrayersBtn.style.display = 'none';
