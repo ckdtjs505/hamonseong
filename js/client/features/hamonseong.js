@@ -207,6 +207,17 @@ async function handleCompletionSubmit(e) {
       closeCompletionModal();
       showToast(`🎉 오늘의 함온성이 성공적으로 저장되었습니다! (${data.data.name} 님)`);
       checkAndRestoreSavedCompletion(getFormattedDate(currentDate));
+      
+      // 달력에 완료된 날짜 추가
+      const savedDate = getFormattedDate(currentDate);
+      if (typeof completedDatesSet !== 'undefined') {
+        completedDatesSet.add(savedDate);
+      }
+      
+      // 달력 다시 렌더링 (index3.html의 달력이 있는 경우)
+      if (typeof renderCustomCalendar !== 'undefined') {
+        renderCustomCalendar();
+      }
     } else {
       showAuthError(elements.completionErrorMsg, data.message || '저장에 실패했습니다.');
     }

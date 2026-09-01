@@ -28,6 +28,16 @@ async function checkAndRestoreSavedCompletion(dateStr) {
 
       if (elements.completionPray) elements.completionPray.value = completion.pray || '';
       if (elements.completionPrayForUser) elements.completionPrayForUser.value = completion.prayForUser || '';
+      
+      // 달력에 완료된 날짜 추가 (index3.html의 커스텀 달력용)
+      if (typeof completedDatesSet !== 'undefined') {
+        completedDatesSet.add(dateStr);
+      }
+      
+      // 달력 다시 렌더링 (index3.html의 달력이 있는 경우)
+      if (typeof renderCustomCalendar !== 'undefined') {
+        renderCustomCalendar();
+      }
     }
   } catch (err) {
     console.error('Error checking saved completion:', err);
