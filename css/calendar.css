@@ -1,0 +1,342 @@
+    /* 커스텀 인라인 달력 컨테이너 */
+    .calendar-inline-container {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border-color);
+      width: 100%;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    /* 달력 래퍼 */
+    .calendar-wrapper {
+      margin-top: 1rem;
+    }
+
+    /* 월 네비게이션 */
+    .month-navigation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+    }
+
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 14px;
+      background: var(--accent-light);
+      color: var(--accent-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    @media (hover: hover) {
+      .nav-btn:hover {
+        background: var(--accent-primary);
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+
+    .nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .month-year {
+      text-align: center;
+      flex: 1;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      min-width: 120px;
+    }
+
+    /* 요일 헤더 */
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .weekday {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 0.8rem 0;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* 날짜 그리드 */
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.8rem;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      border: 2px solid transparent;
+      user-select: none;
+      font-size: 0.95rem;
+    }
+
+    .day-cell.other-month {
+      color: var(--text-muted);
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .day-cell.current-month {
+      background: #f1f5f9;
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    @media (hover: hover) {
+      .day-cell.current-month:hover {
+        background: var(--accent-light);
+        border-color: var(--accent-primary);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+      }
+    }
+    
+    /* 계획이 있는 날 (아직 미완료) - 진한 회색 배경 (선택된 상태 제외) */
+    .day-cell.has-plan:not(.completed):not(.selected) {
+      background: #cbd5e1; /* 기존 배경보다 더 진한 회색 */
+      font-weight: 700;
+      color: var(--text-main);
+      border-color: #94a3b8;
+    }
+
+    .day-cell.today {
+      background: var(--accent-light);
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      font-weight: 700;
+    }
+
+    @media (hover: hover) {
+      .day-cell.today:hover {
+        background: var(--accent-primary);
+        color: white;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+      }
+    }
+
+    .day-cell.completed {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      color: transparent; /* 날짜 숫자 숨김 */
+      border-color: #10b981;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.15);
+      animation: stampBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .day-cell.completed::after {
+      content: '✓';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      box-shadow: none;
+    }
+
+    /* 연속 출석 (2일 이상) - 빨간색 */
+    .day-cell.completed.consecutive-strike {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: transparent;
+      border-color: #dc2626;
+      box-shadow: 0 8px 16px rgba(220, 38, 38, 0.15);
+    }
+
+    .day-cell.completed.consecutive-strike::after {
+      background: transparent;
+      color: #dc2626;
+      box-shadow: none;
+    }
+
+    .day-cell.selected {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #3b82f6;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    @media (hover: hover) {
+      .day-cell.selected:hover {
+        background: #2563eb;
+        color: #ffffff;
+        transform: scale(1.05) translateY(-4px);
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.5);
+      }
+    }
+    
+    /* 완료 + 선택된 상태: 초록색 유지하며 강조 */
+    .day-cell.completed.selected {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: transparent;
+      border-color: #047857;
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .day-cell.completed.selected::after {
+      color: white;
+    }
+
+    /* ─── 다크모드 달력 스타일 ─── */
+    [data-theme="dark"] .day-cell.current-month {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-color: #334155;
+    }
+
+    @media (hover: hover) {
+      [data-theme="dark"] .day-cell.current-month:hover {
+        background: #3949ab;
+        border-color: #5e92f3;
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+      }
+    }
+    
+    [data-theme="dark"] .day-cell.has-plan:not(.completed):not(.selected) {
+      background: #334155; /* 다크모드 진한 회색 */
+      border-color: #475569;
+    }
+
+    [data-theme="dark"] .day-cell.today {
+      background: #5e92f3;
+      color: #ffffff;
+      border-color: #5e92f3;
+      font-weight: 700;
+    }
+
+    @media (hover: hover) {
+      [data-theme="dark"] .day-cell.today:hover {
+        background: #3949ab;
+        color: #ffffff;
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4);
+      }
+    }
+
+    [data-theme="dark"] .day-cell.completed {
+      background: linear-gradient(135deg, #164e63 0%, #0c4a6e 100%);
+      color: transparent;
+      border-color: #10b981;
+      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+    }
+    
+    [data-theme="dark"] .day-cell.completed::after {
+      color: #86efac;
+    }
+
+    [data-theme="dark"] .day-cell.completed.consecutive-strike {
+      background: linear-gradient(135deg, #7f1d1d 0%, #4c0519 100%);
+      color: transparent;
+      border-color: #ef4444;
+      box-shadow: 0 8px 16px rgba(239, 68, 68, 0.2);
+    }
+    
+    [data-theme="dark"] .day-cell.completed.consecutive-strike::after {
+      color: #fca5a5;
+    }
+
+    [data-theme="dark"] .day-cell.selected {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #60a5fa;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.5);
+    }
+
+    @media (hover: hover) {
+      [data-theme="dark"] .day-cell.selected:hover {
+        background: #2563eb;
+        color: #ffffff;
+        transform: scale(1.05) translateY(-4px);
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.6);
+      }
+    }
+
+    [data-theme="dark"] .day-cell.completed.selected {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: transparent;
+      border-color: #34d399;
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
+    }
+    
+    [data-theme="dark"] .day-cell.completed.selected::after {
+      color: white;
+    }
+
+    @keyframes stampBounce {
+      0% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* 달력 스타일 끝 */

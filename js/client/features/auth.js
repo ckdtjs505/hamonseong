@@ -15,6 +15,9 @@ async function checkSession() {
       currentUser = data.user;
       updateAuthUI();
       checkAndRestoreSavedCompletion(getFormattedDate(currentDate));
+      if (typeof loadCompletedDates === 'function') {
+        loadCompletedDates();
+      }
     }
   } catch (err) {
     console.error('Session check error:', err);
@@ -180,6 +183,10 @@ async function handleLogin(e) {
       closeAuthModal();
       showToast(`반갑습니다, ${currentUser.name} 님!`);
       elements.loginForm.reset();
+      
+      if (typeof loadCompletedDates === 'function') {
+        loadCompletedDates();
+      }
     } else {
       showAuthError(elements.loginErrorMsg, data.message || '로그인에 실패했습니다.');
     }
@@ -223,6 +230,10 @@ async function handleRegister(e) {
       closeAuthModal();
       showToast(`회원가입 완료! 환영합니다, ${currentUser.name} 님!`);
       elements.registerForm.reset();
+      
+      if (typeof loadCompletedDates === 'function') {
+        loadCompletedDates();
+      }
     } else {
       showAuthError(elements.registerErrorMsg, data.message || '회원가입에 실패했습니다.');
     }
@@ -245,6 +256,14 @@ async function handleLogout() {
     selectedVersesMap.clear();
     updateSelectedVersesBar();
     showToast(data.message || '로그아웃 되었습니다.');
+    
+    // 로그아웃 시 달력 초기화
+    if (typeof completedDatesSet !== 'undefined') {
+      completedDatesSet.clear();
+      if (typeof renderCustomCalendar === 'function') {
+        renderCustomCalendar();
+      }
+    }
   } catch (err) {
     console.error('Logout error:', err);
     currentUser = null;

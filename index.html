@@ -9,11 +9,11 @@
 
   <!-- Global Error Handler for Mobile WebView Debugging -->
   <script>
-    window.onerror = function(message, source, lineno, colno, error) {
+    window.onerror = function (message, source, lineno, colno, error) {
       showGlobalError('JS Error: ' + message + ' at ' + (source ? source.split('/').pop() : 'unknown') + ':' + lineno);
       return false;
     };
-    window.addEventListener('unhandledrejection', function(event) {
+    window.addEventListener('unhandledrejection', function (event) {
       showGlobalError('Promise Error: ' + (event.reason ? event.reason.message || event.reason : 'Unknown'));
     });
     function showGlobalError(msg) {
@@ -21,8 +21,8 @@
       try {
         if (window.currentUser && (window.currentUser.role === 'admin' || window.currentUser.role === 'leader')) isAdmin = true;
         else if (localStorage.getItem('cached_role') === 'admin' || localStorage.getItem('cached_role') === 'leader') isAdmin = true;
-      } catch (e) {}
-      
+      } catch (e) { }
+
       if (!isAdmin) return;
 
       var errDiv = document.createElement('div');
@@ -41,7 +41,7 @@
       if (document.body) {
         document.body.appendChild(errDiv);
       } else {
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', function () {
           document.body.appendChild(errDiv);
         });
       }
@@ -50,6 +50,9 @@
 
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- 커스텀 달력 스타일 -->
+  <link rel="stylesheet" href="css/calendar.css">
 </head>
 
 <body>
@@ -73,7 +76,8 @@
             <span class="login-action-text">로그인 / 회원가입</span>
           </button>
           <div id="userProfileArea" class="user-profile-area" style="display: none;">
-            <a href="admin/" id="adminLinkBtn" class="btn-auth" style="display: none; background: #fef08a; color: #854d0e; text-decoration: none;">어드민</a>
+            <a href="admin/" id="adminLinkBtn" class="btn-auth"
+              style="display: none; background: #fef08a; color: #854d0e; text-decoration: none;">어드민</a>
             <span id="userNameSpan" class="user-name"></span>
             <button id="logoutBtn" class="btn-auth btn-logout">로그아웃</button>
           </div>
@@ -118,28 +122,42 @@
       </div>
     </header>
 
-    <!-- 2. Date Navigation Bar -->
-    <nav class="date-nav-card">
-      <div class="date-controls">
-        <button id="prevDateBtn" class="btn-nav" aria-label="이전 날짜">
-          <span>‹</span> 이전
-        </button>
 
-        <div class="date-picker-wrapper">
-          <input type="date" id="dateInput" aria-label="날짜 선택">
+
+    <!-- 인라인 달력 뷰 -->
+    <div id="calendarInline" class="calendar-inline-container">
+      <input type="date" id="dateInput" aria-label="날짜 선택" style="display: none;">
+      <div class="calendar-wrapper">
+        <!-- 월 네비게이션 -->
+        <div class="month-navigation">
+          <button class="nav-btn" id="prevMonth">‹</button>
+          <div class="month-year" id="monthYear">2026년 8월</div>
+          <button class="nav-btn" id="nextMonth">›</button>
+        </div>
+        
+        <!-- 오늘 날짜 바로가기 버튼 및 현재 선택 날짜 텍스트 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 0 0.5rem;">
+          <div id="dateDisplayText" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;"></div>
+          <button id="todayBtn" class="btn-nav today-btn" aria-label="오늘 날짜" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border-radius: 8px;">
+            오늘
+          </button>
         </div>
 
-        <button id="todayBtn" class="btn-nav today-btn" aria-label="오늘 날짜">
-          오늘
-        </button>
+        <!-- 요일 헤더 -->
+        <div class="weekdays">
+          <div class="weekday">일</div>
+          <div class="weekday">월</div>
+          <div class="weekday">화</div>
+          <div class="weekday">수</div>
+          <div class="weekday">목</div>
+          <div class="weekday">금</div>
+          <div class="weekday">토</div>
+        </div>
 
-        <button id="nextDateBtn" class="btn-nav" aria-label="다음 날짜">
-          다음 <span>›</span>
-        </button>
+        <!-- 날짜 그리드 -->
+        <div class="days-grid" id="daysGrid"></div>
       </div>
-
-      <div id="dateDisplayText" class="date-display-text"></div>
-    </nav>
+    </div>
 
     <!-- Completion Status Banner -->
     <div id="completionBanner" class="completion-banner" style="display: none;">
@@ -158,7 +176,9 @@
       <div class="plan-summary-header">
         <span class="plan-badge">오늘의 말씀 범위</span>
         <button id="ttsStartBtn" class="btn-tts-start" title="말씀 전체 듣기" onclick="startFullTTS()">
-          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
           전체 듣기
         </button>
       </div>
@@ -222,12 +242,16 @@
       <div class="tts-controls">
         <!-- 정지 버튼 -->
         <button id="ttsStopBtn" aria-label="정지" title="정지">
-          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="5" y="5" width="14" height="14" rx="2" />
+          </svg>
         </button>
 
         <!-- 재생 / 일시정지 버튼 -->
         <button id="ttsPlayPauseBtn" aria-label="재생">
-          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
         </button>
 
         <!-- 닫기 버튼 -->
@@ -420,6 +444,9 @@
   <script src="js/client/features/community.js"></script>
   <!-- 진입점 -->
   <script src="js/client/app.js"></script>
+
+  <!-- 커스텀 달력 스크립트 -->
+  <script src="js/client/features/calendar.js"></script>
 </body>
 
 </html>
