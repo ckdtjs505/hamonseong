@@ -128,20 +128,21 @@
     <div id="calendarInline" class="calendar-inline-container">
       <input type="date" id="dateInput" aria-label="날짜 선택" style="display: none;">
       <div class="calendar-wrapper">
-        <!-- 월 네비게이션 -->
-        <div class="month-navigation">
-          <button class="nav-btn" id="prevMonth">‹</button>
-          <div class="month-year" id="monthYear">2026년 8월</div>
-          <button class="nav-btn" id="nextMonth">›</button>
+        <!-- 달력 헤더 (모던 레이아웃) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0 0.2rem;">
+          <div id="monthYear" style="font-size: 1.3rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em;"></div>
+          
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <button id="todayBtn" aria-label="오늘" style="padding: 0.35rem 0.8rem; font-size: 0.85rem; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">오늘</button>
+            <div style="display: flex; gap: 0.3rem;">
+              <button class="nav-btn" id="prevMonth" style="width: 36px; height: 36px; border-radius: 10px; font-size: 1.2rem;">‹</button>
+              <button class="nav-btn" id="nextMonth" style="width: 36px; height: 36px; border-radius: 10px; font-size: 1.2rem;">›</button>
+            </div>
+          </div>
         </div>
         
-        <!-- 오늘 날짜 바로가기 버튼 및 현재 선택 날짜 텍스트 -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding: 0 0.5rem;">
-          <div id="dateDisplayText" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;"></div>
-          <button id="todayBtn" class="btn-nav today-btn" aria-label="오늘 날짜" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border-radius: 8px;">
-            오늘
-          </button>
-        </div>
+        <!-- 현재 선택 날짜 텍스트 (모바일 UI 개선을 위해 숨김 처리) -->
+        <div id="dateDisplayText" style="display: none;"></div>
 
         <!-- 요일 헤더 -->
         <div class="weekdays">
