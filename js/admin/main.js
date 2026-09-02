@@ -28,6 +28,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (usersNavBtn) usersNavBtn.style.display = 'none';
     }
 
+    // 모바일 메뉴 토글 제어
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const sidebarMenu = document.getElementById('sidebarMenu');
+    if (mobileMenuToggle && sidebarMenu) {
+        mobileMenuToggle.addEventListener('click', () => {
+            sidebarMenu.classList.toggle('active');
+        });
+    }
+
     // 2. 네비게이션 탭 이벤트 설정
     const navItems = document.querySelectorAll('.admin-nav-item[data-target]');
     // 각 탭에 대응하는 콘텐츠 섹션(Section) 요소를 매핑
@@ -79,6 +88,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (target === 'plans') {
                 pageTitle.textContent = '함온성 계획 관리';
                 if (typeof loadPlans === 'function') loadPlans();
+            }
+
+            // 모바일 환경에서 메뉴 항목 클릭 시 메뉴 닫기
+            if (sidebarMenu && sidebarMenu.classList.contains('active')) {
+                sidebarMenu.classList.remove('active');
             }
         });
     });

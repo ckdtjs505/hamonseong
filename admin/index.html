@@ -16,13 +16,18 @@
     <!-- ===== 좌측 사이드바 네비게이션 ===== -->
     <!-- data-target 속성: main.js에서 해당 값으로 섹션을 찾아 표시/숨김 처리 -->
     <aside class="admin-sidebar">
-      <h2>⚙️ 관리자 대시보드</h2>
-      <button class="admin-nav-item" data-target="users">사용자 관리</button>
-      <button class="admin-nav-item" data-target="progress">반별 진행사항 관리</button> <!-- 반별 O/X 진행사항 -->
-      <button class="admin-nav-item" data-target="logs">함온성 기록 관리</button>
-      <button class="admin-nav-item" data-target="plans">함온성 계획 관리</button>
-      <div style="flex-grow: 1;"></div>
-      <button class="admin-nav-item" onclick="window.location.href='../index.html'">돌아가기</button>
+      <div class="sidebar-header">
+        <h2>⚙️ 관리자 대시보드</h2>
+        <button id="mobileMenuToggle" class="mobile-menu-toggle">☰</button>
+      </div>
+      <div id="sidebarMenu" class="sidebar-menu">
+        <button class="admin-nav-item" data-target="users">사용자 관리</button>
+        <button class="admin-nav-item" data-target="progress">반별 진행사항 관리</button> <!-- 반별 O/X 진행사항 -->
+        <button class="admin-nav-item" data-target="logs">함온성 기록 관리</button>
+        <button class="admin-nav-item" data-target="plans">함온성 계획 관리</button>
+        <div class="desktop-spacer" style="flex-grow: 1;"></div>
+        <button class="admin-nav-item" onclick="window.location.href='../index.html'">돌아가기</button>
+      </div>
     </aside>
 
     <main class="admin-main">
