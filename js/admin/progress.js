@@ -144,10 +144,11 @@ function renderProgressTable() {
 
     // ===== 테이블 헤더(thead) 렌더링 =====
     // 각 계획(Day)의 날짜를 "M/D" 형식으로 축약하여 표시
+    const nameColStyleTh = "position: sticky; left: 0; width: 80px; min-width: 80px; max-width: 80px; box-sizing: border-box; background-color: var(--bg-card); z-index: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
+
     const thead = document.getElementById('progressTableHead');
     let headHtml = `<tr>
-        <th style="position: sticky; left: 0; background-color: var(--bg-card); z-index: 2;">이름</th>
-        <th style="position: sticky; left: 80px; background-color: var(--bg-card); z-index: 2;">반</th>`;
+        <th style="${nameColStyleTh}">이름</th>`;
 
     plans.forEach(plan => {
         // 날짜를 "월/일" 축약 형식으로 변환 (예: "2026-09-07" → "9/7")
@@ -170,7 +171,7 @@ function renderProgressTable() {
 
     // 필터 결과가 없을 때 안내 메시지 표시
     if (filteredUsers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="${plans.length + 2}" style="padding: 2rem; color: var(--text-muted);">검색 결과가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${plans.length + 1}" style="padding: 2rem; color: var(--text-muted);">검색 결과가 없습니다.</td></tr>`;
         return;
     }
 
@@ -216,10 +217,11 @@ function renderProgressTable() {
     filteredUsers.forEach(user => {
         const tr = document.createElement('tr');
 
-        // 이름과 반 정보 셀 (좌측 고정: sticky)
+        const nameColStyleTd = "position: sticky; left: 0; width: 80px; min-width: 80px; max-width: 80px; box-sizing: border-box; background-color: var(--bg-card); font-weight: bold; z-index: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
+
+        // 이름 정보 셀 (좌측 고정: sticky)
         let rowHtml = `
-            <td style="position: sticky; left: 0; background-color: var(--bg-card); font-weight: bold; z-index: 1;">${user.name}</td>
-            <td style="position: sticky; left: 80px; background-color: var(--bg-card); z-index: 1;">${user.class_group || '-'}</td>
+            <td style="${nameColStyleTd}" title="${user.name}">${user.name}</td>
         `;
 
         // 해당 사용자의 완료 기록 Map
