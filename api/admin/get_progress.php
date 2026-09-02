@@ -23,15 +23,13 @@ try {
     if (!$pdo) {
         throw new Exception("데이터베이스 연결에 실패했습니다.");
     }
-    
+
     // 테이블 존재 여부 확인 및 자동 생성
     ensureUsersTable($pdo);
     ensureHamonseongLogsTable($pdo);
 
-    // 1. 모든 학생/일반 사용자 조회 (admin 제외)
-    //    - class_group이 NULL인 사용자가 뒤로 가도록 정렬
-    //    - 같은 반 내에서는 이름순 정렬
-    $stmtUsers = $pdo->prepare("SELECT `id`, `name`, `username`, `class_group` FROM `users` WHERE `role` = 'member' ORDER BY `class_group` IS NULL, `class_group`, `name`");
+    // 1. 모든 학생/일반 사용자 조회 (전체 사용자 포함, 프론트엔드에서 role로 필터링)
+    $stmtUsers = $pdo->prepare("SELECT `id`, `name`, `username`, `class_group`, `role` FROM `users` ORDER BY `class_group` IS NULL, `class_group`, `name`");
     $stmtUsers->execute();
     $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
 
@@ -58,14 +56,14 @@ try {
         'status' => 'success',
         'data' => [
             'users' => $users,
-            'logs'  => $logs,
+            'logs' => $logs,
             'plans' => $plans
         ]
     ], JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
-        'status'  => 'error',
+        'status' => 'error',
         'message' => '진행사항을 불러오는 중 오류가 발생했습니다: ' . $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }

@@ -73,10 +73,10 @@ function renderClassFilters() {
     const container = document.getElementById('classFilterContainer');
     container.innerHTML = '';
 
-    // 사용자 데이터에서 고유한 반 이름 추출
+    // 사용자 데이터에서 고유한 반 이름 추출 (member만 대상)
     const classes = new Set();
     progressData.users.forEach(u => {
-        if (u.class_group) classes.add(u.class_group);
+        if (u.role === 'member' && u.class_group) classes.add(u.class_group);
     });
 
     const classArray = Array.from(classes).sort();
@@ -90,7 +90,7 @@ function renderClassFilters() {
     container.appendChild(btnAll);
 
     // "미지정" 버튼 생성 (반이 아직 지정되지 않은 사용자 표시)
-    const hasUnassigned = progressData.users.some(u => !u.class_group);
+    const hasUnassigned = progressData.users.some(u => u.role === 'member' && !u.class_group);
     if (hasUnassigned) {
         const btnUnassigned = document.createElement('button');
         btnUnassigned.className = `admin-btn ${currentClassFilter === 'none' ? 'admin-btn-primary' : ''}`;
@@ -126,8 +126,10 @@ function renderProgressTable() {
     // 이름 검색 필터 값 가져오기
     const searchInput = document.getElementById('progressSearchInput').value.toLowerCase().trim();
 
-    // 반 필터 + 이름 검색 조건으로 사용자 필터링
+    // 반 필터 + 이름 검색 조건으로 사용자 필터링 (member만 대상)
     let filteredUsers = progressData.users.filter(u => {
+        if (u.role !== 'member') return false;
+
         // 반(class) 필터 적용
         if (currentClassFilter === 'none' && u.class_group) return false;
         if (currentClassFilter !== 'all' && currentClassFilter !== 'none' && u.class_group !== currentClassFilter) return false;

@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 각 탭에 대응하는 콘텐츠 섹션(Section) 요소를 매핑
     // data-target 속성값을 key로, 해당 섹션 DOM 요소를 value로 저장
     const sections = {
+        home: document.getElementById('homeSection'),         // 대시보드 홈
         users: document.getElementById('usersSection'),       // 사용자 관리
         progress: document.getElementById('progressSection'), // 반별 진행사항 관리
         logs: document.getElementById('logsSection'),         // 함온성 기록 관리
@@ -72,6 +73,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // 선택된 탭에 따라 페이지 제목 변경 및 해당 데이터 로드 함수 호출
+            if (target === 'home') {
+                pageTitle.textContent = '대시보드 홈';
+                if (typeof loadHomeStats === 'function') loadHomeStats();
+            }
             if (target === 'users') {
                 pageTitle.textContent = '사용자 관리';
                 if (typeof loadUsers === 'function') loadUsers();
@@ -98,15 +103,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // 3. 초기 화면 설정
-    //    - admin: 사용자 관리(users) 탭으로 시작
+    //    - admin: 대시보드 홈(home) 탭으로 시작
     //    - leader: 반별 진행사항(progress) 탭으로 시작
     if (checkData.user.role === 'leader') {
         // leader 진입 시 기본 탭을 진행사항으로 설정
         const progressNavBtn = document.querySelector('.admin-nav-item[data-target="progress"]');
         if (progressNavBtn) progressNavBtn.click();
     } else {
-        if (typeof loadUsers === 'function') {
-            loadUsers();
-        }
+        const homeNavBtn = document.querySelector('.admin-nav-item[data-target="home"]');
+        if (homeNavBtn) homeNavBtn.click();
     }
 });
