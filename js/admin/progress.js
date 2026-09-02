@@ -185,7 +185,7 @@ function renderProgressTable() {
     });
 
     // 사용자별 완료한 일차(daycnt) 목록을 Map으로 구성
-    // key: user_id, value: Set('day_1', 'day_2', ... 또는 'date_2026. 9. 7' 형태)
+    // key: user_id, value: Map('day_1' -> log, 'date_2026. 9. 7' -> log)
     const userLogsMap = {};
     progressData.logs.forEach(log => {
         // 기록 날짜 파싱: "2026. 7. 29." 형식
@@ -201,14 +201,14 @@ function renderProgressTable() {
             }
         }
 
-        if (!userLogsMap[log.user_id]) userLogsMap[log.user_id] = new Set();
+        if (!userLogsMap[log.user_id]) userLogsMap[log.user_id] = new Map();
         // daycnt(일차) 값이 있으면 일차 기준으로 기록
         if (log.daycnt) {
-            userLogsMap[log.user_id].add('day_' + log.daycnt);
+            userLogsMap[log.user_id].set('day_' + log.daycnt, log);
         }
         // daycnt가 정확하지 않을 수 있으므로 (예: 프론트엔드에서 1로 하드코딩 등), 날짜(timestamp) 기준 기록도 항상 추가
         if (log.timestamp) {
-            userLogsMap[log.user_id].add('date_' + log.timestamp);
+            userLogsMap[log.user_id].set('date_' + log.timestamp, log);
         }
     });
 
@@ -222,24 +222,26 @@ function renderProgressTable() {
             <td style="position: sticky; left: 80px; background-color: var(--bg-card); z-index: 1;">${user.class_group || '-'}</td>
         `;
 
-        // 해당 사용자의 완료 기록 Set
-        const userCompletedMap = userLogsMap[user.id] || new Set();
+        // 해당 사용자의 완료 기록 Map
+        const userCompletedMap = userLogsMap[user.id] || new Map();
 
         plans.forEach(plan => {
             // 1차 판정: daycnt(일차) 기준으로 완료 여부 확인
-            let isCompleted = userCompletedMap.has('day_' + plan.daycount);
+            let completedLog = userCompletedMap.get('day_' + plan.daycount);
 
             // 2차 판정 (폴백): daycnt가 없거나 0인 경우, 날짜(timestamp) 기준으로 매칭 시도
             // read_plan.date: "2026-09-07", hamonseong_logs.timestamp: "2026. 9. 7"
-            if (!isCompleted && plan.date) {
+            if (!completedLog && plan.date) {
                 const dateObj = new Date(plan.date);
                 const possibleLogStr1 = `date_${dateObj.getFullYear()}. ${dateObj.getMonth() + 1}. ${dateObj.getDate()}`;
-                if (userCompletedMap.has(possibleLogStr1)) isCompleted = true;
+                completedLog = userCompletedMap.get(possibleLogStr1);
             }
 
             // O(완료, 초록색) 또는 X(미완료, 회색) 표시
-            if (isCompleted) {
-                rowHtml += `<td style="color: #4ade80; font-weight: bold;">O</td>`;
+            if (completedLog) {
+                const fullMyMsg = escapeHtml(completedLog.myMessage || '-');
+                const fullPray = escapeHtml(completedLog.pray || '-');
+                rowHtml += `<td style="color: #4ade80; font-weight: bold; cursor: pointer; text-decoration: underline;" onclick="openLogDetailModal(\`${fullMyMsg}\`, \`${fullPray}\`)" title="클릭하여 내용 보기">O</td>`;
             } else {
                 rowHtml += `<td style="color: var(--border-color);">X</td>`;
             }

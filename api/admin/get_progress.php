@@ -39,7 +39,9 @@ try {
     //    - user_id: 작성한 사용자 ID
     //    - timestamp: 기록 날짜 (예: "2026. 9. 7")
     //    - daycnt: 읽기 일차 (예: 1, 2, 3...)
-    $stmtLogs = $pdo->prepare("SELECT `user_id`, `timestamp`, `daycnt` FROM `hamonseong_logs` ORDER BY `id` ASC");
+    //    - myMessage: 선택한 말씀 모음
+    //    - pray: 묵상 및 기도
+    $stmtLogs = $pdo->prepare("SELECT `user_id`, `timestamp`, `daycnt`, `myMessage`, `pray` FROM `hamonseong_logs` ORDER BY `id` ASC");
     $stmtLogs->execute();
     $logs = $stmtLogs->fetchAll(PDO::FETCH_ASSOC);
 
