@@ -34,8 +34,9 @@ function renderLogs(logs) {
         const myMsg = log.myMessage ? log.myMessage.substring(0, 30) + (log.myMessage.length > 30 ? '...' : '') : '-';
         const pray = log.pray ? log.pray.substring(0, 30) + (log.pray.length > 30 ? '...' : '') : '-';
 
-        const fullMyMsg = escapeHtml(log.myMessage || '-');
-        const fullPray = escapeHtml(log.pray || '-');
+        const encMyMsg = encodeURIComponent(log.myMessage || '-');
+        const encPray = encodeURIComponent(log.pray || '-');
+        const encPrayForUser = encodeURIComponent(log.prayForUser || '-');
         
         tr.innerHTML = `
             <td>${log.id}</td>
@@ -52,7 +53,7 @@ function renderLogs(logs) {
                   <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">
                     <strong>기도:</strong> ${pray}
                   </span>
-                  <button class="admin-btn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; background: var(--bg-primary); border: 1px solid var(--border-color);" onclick="openLogDetailModal(\`${fullMyMsg}\`, \`${fullPray}\`)">자세히</button>
+                  <button class="admin-btn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem; background: var(--bg-primary); border: 1px solid var(--border-color);" onclick="openLogDetailModal('${encMyMsg}', '${encPray}', '${encPrayForUser}')">자세히</button>
                 </div>
             </td>
             <td>${new Date(log.created_at).toLocaleString()}</td>
@@ -97,9 +98,13 @@ window.deleteLog = async (logId) => {
 /**
  * 로그 상세 모달 열기
  */
-window.openLogDetailModal = function(myMsg, pray) {
-    document.getElementById('logDetailMsg').textContent = myMsg;
-    document.getElementById('logDetailPray').textContent = pray;
+window.openLogDetailModal = function(encMyMsg, encPray, encPrayForUser) {
+    document.getElementById('logDetailMsg').textContent = decodeURIComponent(encMyMsg);
+    document.getElementById('logDetailPray').textContent = decodeURIComponent(encPray);
+    const prayForUserEl = document.getElementById('logDetailPrayForUser');
+    if (prayForUserEl) {
+        prayForUserEl.textContent = encPrayForUser ? decodeURIComponent(encPrayForUser) : '-';
+    }
     document.getElementById('logDetailModal').style.display = 'flex';
 };
 

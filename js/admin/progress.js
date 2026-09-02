@@ -239,9 +239,10 @@ function renderProgressTable() {
 
             // O(완료, 초록색) 또는 X(미완료, 회색) 표시
             if (completedLog) {
-                const fullMyMsg = escapeHtml(completedLog.myMessage || '-');
-                const fullPray = escapeHtml(completedLog.pray || '-');
-                rowHtml += `<td style="color: #4ade80; font-weight: bold; cursor: pointer; text-decoration: underline;" onclick="openLogDetailModal(\`${fullMyMsg}\`, \`${fullPray}\`)" title="클릭하여 내용 보기">O</td>`;
+                const encMyMsg = encodeURIComponent(completedLog.myMessage || '-');
+                const encPray = encodeURIComponent(completedLog.pray || '-');
+                const encPrayForUser = encodeURIComponent(completedLog.prayForUser || '-');
+                rowHtml += `<td style="color: #4ade80; font-weight: bold; cursor: pointer; text-decoration: underline;" onclick="openLogDetailModal('${encMyMsg}', '${encPray}', '${encPrayForUser}')" title="클릭하여 내용 보기">O</td>`;
             } else {
                 rowHtml += `<td style="color: var(--border-color);">X</td>`;
             }

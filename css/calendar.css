@@ -174,19 +174,7 @@
       box-shadow: none;
     }
 
-    /* 연속 출석 (2일 이상) - 빨간색 */
-    .day-cell.completed.consecutive-strike {
-      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-      color: transparent;
-      border-color: #dc2626;
-      box-shadow: 0 8px 16px rgba(220, 38, 38, 0.15);
-    }
 
-    .day-cell.completed.consecutive-strike::after {
-      background: transparent;
-      color: #dc2626;
-      box-shadow: none;
-    }
 
     .day-cell.selected {
       background: #3b82f6;
@@ -265,16 +253,7 @@
       color: #86efac;
     }
 
-    [data-theme="dark"] .day-cell.completed.consecutive-strike {
-      background: linear-gradient(135deg, #7f1d1d 0%, #4c0519 100%);
-      color: transparent;
-      border-color: #ef4444;
-      box-shadow: 0 8px 16px rgba(239, 68, 68, 0.2);
-    }
 
-    [data-theme="dark"] .day-cell.completed.consecutive-strike::after {
-      color: #fca5a5;
-    }
 
     [data-theme="dark"] .day-cell.selected {
       background: #3b82f6;
