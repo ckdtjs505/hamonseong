@@ -42,20 +42,39 @@ try {
     $prayForUser = trim($input['prayForUser'] ?? '');
     $daycnt = (int)($input['daycnt'] ?? 1);
 
+    $dbDateStr = '';
     // 날짜 타임스탬프 포맷 생성 (예: 2026. 1. 5)
     if (!empty($input['timestamp'])) {
         $timestampStr = trim($input['timestamp']);
+        // timestampStr 기반으로 dbDateStr 유추 시도 (2026. 9. 7 -> 2026-09-07)
+        $parts = explode('.', str_replace(' ', '', $timestampStr));
+        if (count($parts) >= 3) {
+            $dbDateStr = sprintf("%04d-%02d-%02d", (int)$parts[0], (int)$parts[1], (int)$parts[2]);
+        }
     } elseif (!empty($input['date'])) {
-        $parts = explode('-', trim($input['date']));
+        $dbDateStr = trim($input['date']);
+        $parts = explode('-', $dbDateStr);
         if (count($parts) === 3) {
             $timestampStr = sprintf("%d. %d. %d", (int)$parts[0], (int)$parts[1], (int)$parts[2]);
         } else {
             $now = new DateTime();
             $timestampStr = sprintf("%d. %d. %d", $now->format('Y'), $now->format('n'), $now->format('j'));
+            $dbDateStr = $now->format('Y-m-d');
         }
     } else {
         $now = new DateTime();
         $timestampStr = sprintf("%d. %d. %d", $now->format('Y'), $now->format('n'), $now->format('j'));
+        $dbDateStr = $now->format('Y-m-d');
+    }
+
+    // daycnt가 1로 하드코딩 되어 넘어오는 경우가 많으므로, read_plan에서 정확한 daycount를 조회
+    if (!empty($dbDateStr)) {
+        $planStmt = $pdo->prepare("SELECT `daycount` FROM `read_plan` WHERE `date` = :date LIMIT 1");
+        $planStmt->execute(['date' => $dbDateStr]);
+        $planData = $planStmt->fetch(PDO::FETCH_ASSOC);
+        if ($planData && isset($planData['daycount'])) {
+            $daycnt = (int)$planData['daycount'];
+        }
     }
 
     if (empty($myMessage)) {

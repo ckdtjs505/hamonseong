@@ -104,6 +104,17 @@ function renderReadingPlan(plans, wordResults) {
 
     if (elements.planTitle) elements.planTitle.textContent = rangeTitles.join(', ');
 
+    if (elements.planDayCount) {
+      if (plans.length > 0 && plans[0].daycount) {
+        currentDayCount = parseInt(plans[0].daycount, 10);
+        elements.planDayCount.textContent = `Day ${currentDayCount}`;
+        elements.planDayCount.style.display = 'inline-block';
+      } else {
+        currentDayCount = 1;
+        elements.planDayCount.style.display = 'none';
+      }
+    }
+
     if (elements.planRangeList) {
       elements.planRangeList.innerHTML = rangeTitles
         .map(text => `<span class="range-chip">${text}</span>`)

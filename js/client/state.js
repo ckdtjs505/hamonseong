@@ -8,6 +8,7 @@ let currentDate = new Date();
 let currentFontSize = parseFloat(localStorage.getItem('bible_font_size')) || 1.125;
 let currentVersion = localStorage.getItem('bible_version') || 'woori';
 let currentUser = null;
+let currentDayCount = 1;
 const selectedVersesMap = new Map();
 
 // ── DOM 요소 참조 ───────────────────────────────────────────
@@ -25,6 +26,7 @@ const elements = {
   planSummaryCard: document.getElementById('planSummaryCard'),
   planTitle: document.getElementById('planTitle'),
   planRangeList: document.getElementById('planRangeList'),
+  planDayCount: document.getElementById('planDayCount'),
   readingContainer: document.getElementById('readingContainer'),
   toast: document.getElementById('toast'),
 

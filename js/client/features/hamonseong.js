@@ -196,7 +196,7 @@ async function handleCompletionSubmit(e) {
         myMessage,
         pray,
         prayForUser,
-        daycnt: 1,
+        daycnt: typeof currentDayCount !== 'undefined' ? currentDayCount : 1,
         date: getFormattedDate(currentDate)
       })
     });

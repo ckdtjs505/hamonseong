@@ -202,10 +202,12 @@ function renderProgressTable() {
         }
 
         if (!userLogsMap[log.user_id]) userLogsMap[log.user_id] = new Set();
-        // daycnt(일차) 값이 있으면 일차 기준으로, 없으면 날짜(timestamp) 기준으로 기록
+        // daycnt(일차) 값이 있으면 일차 기준으로 기록
         if (log.daycnt) {
             userLogsMap[log.user_id].add('day_' + log.daycnt);
-        } else {
+        }
+        // daycnt가 정확하지 않을 수 있으므로 (예: 프론트엔드에서 1로 하드코딩 등), 날짜(timestamp) 기준 기록도 항상 추가
+        if (log.timestamp) {
             userLogsMap[log.user_id].add('date_' + log.timestamp);
         }
     });
