@@ -114,12 +114,6 @@ function renderReadingPlan(plans, wordResults) {
         elements.planDayCount.style.display = 'none';
       }
     }
-
-    if (elements.planRangeList) {
-      elements.planRangeList.innerHTML = rangeTitles
-        .map(text => `<span class="range-chip">${text}</span>`)
-        .join('');
-    }
   }
 
   // 2. 구절 렌더링

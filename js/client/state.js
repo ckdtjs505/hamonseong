@@ -25,7 +25,6 @@ const elements = {
   dateDisplayText: document.getElementById('dateDisplayText'),
   planSummaryCard: document.getElementById('planSummaryCard'),
   planTitle: document.getElementById('planTitle'),
-  planRangeList: document.getElementById('planRangeList'),
   planDayCount: document.getElementById('planDayCount'),
   readingContainer: document.getElementById('readingContainer'),
   toast: document.getElementById('toast'),

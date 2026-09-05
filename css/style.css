@@ -401,24 +401,6 @@ body {
   margin-top: 0.2rem;
 }
 
-.plan-range-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.4rem;
-}
-
-.range-chip {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 0.3rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--accent-primary);
-  box-shadow: var(--shadow-sm);
-}
-
 /* 7. Scripture Reading Area */
 .reading-container {
   background-color: var(--bg-card);
