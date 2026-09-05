@@ -3,13 +3,13 @@
   max-width: 800px;
   margin: 2rem auto;
   padding: 2rem;
-  background-color: var(--surface-color, #ffffff);
+  background-color: var(--bg-card, #ffffff);
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="dark"] .guide-container {
-  background-color: var(--surface-color, #1f2937);
+  background-color: var(--bg-card, #1f2937);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
@@ -22,7 +22,7 @@
 
 .guide-header h1 {
   font-size: 2rem;
-  color: var(--text-color, #111827);
+  color: var(--text-main, #111827);
   margin-bottom: 0.5rem;
 }
 
@@ -36,7 +36,7 @@
 
 .guide-section h2 {
   font-size: 1.5rem;
-  color: var(--primary-color, #3b82f6);
+  color: var(--accent-primary, #3b82f6);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -45,21 +45,21 @@
 
 .guide-section h3 {
   font-size: 1.25rem;
-  color: var(--text-color, #374151);
+  color: var(--text-main, #374151);
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
 
 .guide-section p {
   line-height: 1.6;
-  color: var(--text-color, #374151);
+  color: var(--text-main, #374151);
   margin-bottom: 1rem;
 }
 
 .guide-section ul, .guide-section ol {
   margin-left: 1.5rem;
   margin-bottom: 1rem;
-  color: var(--text-color, #374151);
+  color: var(--text-main, #374151);
 }
 
 .guide-section li {
@@ -70,7 +70,7 @@
 .guide-image-placeholder {
   width: 100%;
   height: 200px;
-  background-color: var(--bg-color, #f3f4f6);
+  background-color: var(--bg-subtle, #f3f4f6);
   border: 2px dashed var(--border-color, #d1d5db);
   border-radius: 8px;
   display: flex;
@@ -86,7 +86,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: var(--primary-color, #3b82f6);
+  background-color: var(--accent-primary, #3b82f6);
   color: white;
   border-radius: 6px;
   text-decoration: none;
@@ -97,7 +97,7 @@
 }
 
 .back-btn:hover {
-  background-color: var(--primary-hover, #2563eb);
+  background-color: var(--accent-hover, #2563eb);
 }
 
 .guide-footer {
