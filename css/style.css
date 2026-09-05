@@ -620,7 +620,8 @@ body {
     width: 100%;
   }
 
-  .user-auth-area, .user-profile-area {
+  .user-auth-area,
+  .user-profile-area {
     width: 100%;
   }
 
@@ -939,7 +940,7 @@ body {
 
 /* When TTS Player is active, move the selected verses bar up */
 body.tts-active .selected-verses-bar {
-  bottom: calc(1rem + 75px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 
 .selected-verses-bar {
@@ -1782,16 +1783,16 @@ body.tts-active .selected-verses-bar {
 
   /* Selected Verses Floating Bar Mobile */
   .selected-verses-bar {
-    width: 94%;
+    width: 96%;
     bottom: 1rem;
-    padding: 0.75rem 0.9rem;
+    padding: 0.6rem 0.75rem;
     flex-direction: row;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
 
   body.tts-active .selected-verses-bar {
-    bottom: calc(1rem + 75px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
 
   .selected-bar-info {
