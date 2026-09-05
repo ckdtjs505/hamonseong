@@ -59,6 +59,10 @@ if ($isLocalhost) {
     $cookieParams['samesite'] = 'Lax';
 }
 
+// 서버 측 세션 유지 시간 설정 (30일)
+ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 30);
+
+
 // API 응답 캐싱 방지 (카카오 인앱 브라우저의 강력한 캐싱으로 인한 과거 상태 반환 방지)
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
