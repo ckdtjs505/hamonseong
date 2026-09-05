@@ -92,6 +92,12 @@ function clearSelectedVerses() {
     el.classList.remove('selected');
   });
   updateSelectedVersesBar();
+  
+  // 입력 폼 초기화 (연속으로 할 때 이전 데이터 남지 않도록)
+  if (elements.completionPray) elements.completionPray.value = '';
+  if (elements.completionPrayForUser) elements.completionPrayForUser.value = '';
+  if (elements.completionMyMessage) elements.completionMyMessage.value = '';
+
   showToast('선택한 구절이 모두 해제되었습니다.');
 }
 

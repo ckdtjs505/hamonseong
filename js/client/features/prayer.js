@@ -14,6 +14,12 @@
  */
 async function checkAndRestoreSavedCompletion(dateStr) {
   hideCompletionBanner();
+  
+  // 폼 초기화 (다른 날짜 이동 시 이전 기록 남지 않게 초기화)
+  if (elements.completionPray) elements.completionPray.value = '';
+  if (elements.completionPrayForUser) elements.completionPrayForUser.value = '';
+  if (elements.completionMyMessage) elements.completionMyMessage.value = '';
+
   if (!currentUser) return;
 
   try {
