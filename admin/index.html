@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 페이지 - 청소년부 성경 읽기</title>
+  <!-- <link rel="icon" type="image/png" href="../favicon.png"> -->
 
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/admin.css">
@@ -24,6 +25,7 @@
         <button class="admin-nav-item" data-target="home">대시보드 홈</button>
         <button class="admin-nav-item" data-target="users">사용자 관리</button>
         <button class="admin-nav-item" data-target="progress">반별 진행사항 관리</button> <!-- 반별 O/X 진행사항 -->
+        <button class="admin-nav-item" data-target="ranking">열정 랭킹</button>
         <button class="admin-nav-item" data-target="logs">함온성 기록 관리</button>
         <button class="admin-nav-item" data-target="plans">함온성 계획 관리</button>
         <div class="desktop-spacer" style="flex-grow: 1;"></div>
@@ -89,6 +91,29 @@
             </thead>
             <tbody id="homeRecentActivityBody">
               <!-- JS will populate recent activity -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Ranking Section -->
+      <section id="rankingSection" class="admin-card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3>🏆 학생 열정 랭킹 (전체)</h3>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="admin-table" style="text-align: center;">
+            <thead>
+              <tr>
+                <th>순위</th>
+                <th>이름</th>
+                <th>반(Class)</th>
+                <th>완독 횟수</th>
+                <th>최근 활동일</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody">
+              <!-- JS will populate ranking -->
             </tbody>
           </table>
         </div>
@@ -292,6 +317,7 @@
   <script src="../js/admin/logs.js"></script>
   <script src="../js/admin/plans.js"></script>
   <script src="../js/admin/home.js"></script>
+  <script src="../js/admin/ranking.js"></script>
   <script src="../js/admin/main.js"></script>
 </body>
 

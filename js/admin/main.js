@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         home: document.getElementById('homeSection'),         // 대시보드 홈
         users: document.getElementById('usersSection'),       // 사용자 관리
         progress: document.getElementById('progressSection'), // 반별 진행사항 관리
+        ranking: document.getElementById('rankingSection'),   // 열정 랭킹
         logs: document.getElementById('logsSection'),         // 함온성 기록 관리
         plans: document.getElementById('plansSection')        // 함온성 계획 관리
     };
@@ -85,6 +86,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (target === 'progress') {
                 pageTitle.textContent = '반별 진행사항 관리';
                 if (typeof loadProgress === 'function') loadProgress();
+            }
+            if (target === 'ranking') {
+                pageTitle.textContent = '학생 열정 랭킹';
+                if (typeof loadRanking === 'function') loadRanking();
             }
             if (target === 'logs') {
                 pageTitle.textContent = '함온성 기록 관리';

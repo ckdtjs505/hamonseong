@@ -6,7 +6,6 @@ require_once __DIR__ . '/../common/cors_session.php';
  *
  * 응답 데이터:
  * - summary    : 오늘 읽은 학생 수, 전체 완독 횟수
- * - rankings   : 멤버별 완독 횟수 랭킹 (TOP 10)
  * - recentFeed : 최근 묵상/기도 피드 (20건)
  * - topVerses  : 가장 많이 선택된 인기 말씀 (TOP 10)
  */
@@ -37,16 +36,6 @@ try {
 
     $totalStmt = $pdo->query("SELECT COUNT(*) FROM `hamonseong_logs`");
     $totalCompletions = (int)($totalStmt->fetchColumn() ?? 0);
-
-    // 2. 멤버 랭킹
-    $rankStmt = $pdo->query("
-        SELECT `name`, COUNT(*) as total_count, MAX(`created_at`) as last_active
-        FROM `hamonseong_logs`
-        GROUP BY `name`
-        ORDER BY total_count DESC, last_active DESC
-        LIMIT 10
-    ");
-    $rankings = $rankStmt->fetchAll();
 
     // 3. 최근 묵상/기도 피드 (20건)
     $feedStmt = $pdo->query("
@@ -106,7 +95,6 @@ try {
                 'today_users'       => $todayUsers,
                 'total_completions' => $totalCompletions
             ],
-            'rankings'   => $rankings,
             'recentFeed' => $recentFeed,
             'topVerses'  => $topVerses
         ]

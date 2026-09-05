@@ -197,4 +197,6 @@ function renderHomeStats(users, logs, plans) {
     if (recentLogs.length === 0) {
         recentActivityBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1rem;">최근 활동 내역이 없습니다.</td></tr>';
     }
+
+
 }

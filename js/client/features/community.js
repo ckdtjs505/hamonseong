@@ -61,26 +61,6 @@ async function loadCommunityStats() {
     if (elements.statTodayCount) elements.statTodayCount.textContent = `${data.summary.today_users || 0}명`;
     if (elements.statTotalCount) elements.statTotalCount.textContent = `${data.summary.total_completions || 0}회`;
 
-    // 2. 멤버 랭킹
-    if (elements.memberRankingsList) {
-      if (!data.rankings || data.rankings.length === 0) {
-        elements.memberRankingsList.innerHTML = `<div style="font-size:0.85rem; color:var(--text-subtle); padding:0.5rem 0;">아직 참여한 친구가 없습니다.</div>`;
-      } else {
-        elements.memberRankingsList.innerHTML = data.rankings.map((user, idx) => {
-          const rank = idx + 1;
-          const badgeClass = rank <= 3 ? `top-${rank}` : '';
-          return `
-            <div class="ranking-item">
-              <div class="ranking-user">
-                <span class="rank-badge ${badgeClass}">${rank}</span>
-                <span>${escapeHtml(user.name)}</span>
-              </div>
-              <div class="ranking-count">${user.total_count}회 완료</div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
 
     // 3. 커뮤니티 묵상 피드
     if (elements.communityFeedList) {

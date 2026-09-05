@@ -79,7 +79,6 @@ const elements = {
   popularVersesTab: document.getElementById('popularVersesTab'),
   statTodayCount: document.getElementById('statTodayCount'),
   statTotalCount: document.getElementById('statTotalCount'),
-  memberRankingsList: document.getElementById('memberRankingsList'),
   communityFeedList: document.getElementById('communityFeedList'),
   popularVersesList: document.getElementById('popularVersesList')
 };
