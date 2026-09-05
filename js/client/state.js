@@ -62,7 +62,6 @@ const elements = {
   myPrayersBtn: document.getElementById('myPrayersBtn'),
   completionBanner: document.getElementById('completionBanner'),
   completionBannerTitle: document.getElementById('completionBannerTitle'),
-  completionBannerSub: document.getElementById('completionBannerSub'),
   editCompletionBtn: document.getElementById('editCompletionBtn'),
   prayerHistoryModal: document.getElementById('prayerHistoryModal'),
   prayerHistoryCloseBtn: document.getElementById('prayerHistoryCloseBtn'),
