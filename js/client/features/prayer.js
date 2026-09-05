@@ -150,7 +150,7 @@ async function loadPrayerHistory() {
       const myMessageHtml = item.myMessage ? escapeHtml(item.myMessage) : '';
       const prayHtml = item.pray ? escapeHtml(item.pray) : '';
       const prayForUserHtml = item.prayForUser ? escapeHtml(item.prayForUser) : '';
-      const rawDateStr = item.created_at || item.timestamp;
+      const rawDateStr = item.timestamp || item.created_at;
 
       return `
         <div class="prayer-card">
