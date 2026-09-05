@@ -48,6 +48,13 @@ try {
         exit();
     }
 
+    // 3.5. 이름 한글 검증 (정규식: 한글로 1~6글자)
+    if (!preg_match('/^[가-힣]{1,6}$/u', $name)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => '이름은 한글로 1~6글자만 입력 가능하며, 특수문자나 공백은 사용할 수 없습니다.']);
+        exit();
+    }
+
     // 4. 아이디 중복 확인: 이미 존재하는 아이디인지 검사
     $checkStmt = $pdo->prepare("SELECT `id` FROM `users` WHERE `username` = :username");
     $checkStmt->execute(['username' => $username]);

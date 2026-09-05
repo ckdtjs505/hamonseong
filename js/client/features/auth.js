@@ -213,6 +213,12 @@ async function handleRegister(e) {
     return;
   }
 
+  const nameRegex = /^[가-힣]{1,6}$/;
+  if (!nameRegex.test(name)) {
+    showAuthError(elements.registerErrorMsg, '이름은 한글로 1~6글자만 입력 가능하며, 특수문자나 공백은 사용할 수 없습니다.');
+    return;
+  }
+
   try {
     const res = await fetch(`${API_BASE_URL}api/auth/register.php`, {
       method: 'POST',

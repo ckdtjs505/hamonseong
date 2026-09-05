@@ -299,8 +299,9 @@
       <!-- Register Form -->
       <form id="registerForm" class="auth-form" style="display: none;">
         <div class="form-group">
-          <label for="registerName">이름 (학생/선생님)</label>
-          <input type="text" id="registerName" placeholder="실명을 입력하세요 (예: 홍길동)" required>
+          <label for="registerName">이름 </label>
+          <input type="text" id="registerName" placeholder="실명을 입력하세요 (예: 홍길동)" pattern="^[가-힣]{1,6}$"
+            title="이름은 한글로 1~6글자만 입력 가능하며, 특수문자나 공백은 사용할 수 없습니다." required>
         </div>
         <div class="form-group">
           <label for="registerUsername">아이디</label>
